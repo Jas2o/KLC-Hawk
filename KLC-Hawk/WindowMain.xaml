@@ -1,0 +1,54 @@
+﻿<Window x:Class="KLC_Hawk.WindowMain"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:KLC_Hawk"
+        mc:Ignorable="d"
+        Title="KLC-Hawk" Height="450" Width="800" Closing="Window_Closing">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Log">
+                <MenuItem x:Name="menuLogClear" Header="Clear" Click="menuLogClear_Click" />
+                <Separator />
+                <MenuItem x:Name="menuLogClipboard" Header="Clipboard Events" IsCheckable="True" IsChecked="{Binding LogClipboardEvents}"/>
+                <MenuItem x:Name="menuLogHackKeyRelease" Header="Hacks: Key Release" IsCheckable="True" IsChecked="{Binding LogHacksKeyRelease}" />
+            </MenuItem>
+
+            <MenuItem Header="Capture">
+                <MenuItem Header="KLC-Shark" IsEnabled="False" />
+                <MenuItem x:Name="menuStartCapture" Header="Start Capture" Click="menuStartCapture_Click" />
+                <MenuItem x:Name="menuOpenCapture" Header="Open Capture File" Click="menuOpenCapture_Click" />
+                <Separator />
+                <MenuItem Header="Wireshark Filters" IsEnabled="False" />
+                <MenuItem Header="(only for last session)" IsEnabled="False" />
+                <MenuItem x:Name="menuFilterAll" Header="Filter for all" Click="menuFilterAll_Click" />
+                <MenuItem x:Name="menuFilterLC" Header="Just Live Connect" Click="menuFilterLC_Click" />
+                <MenuItem x:Name="menuFilterAEP" Header="Just AdminEndPoint" Click="menuFilterAEP_Click" />
+            </MenuItem>
+            <MenuItem Header="Autotype">
+                <MenuItem x:Name="menuAutotypeFast" Header="Fast" IsCheckable="True" Click="menuAutotypeFast_Click" IsChecked="True"/>
+                <MenuItem x:Name="menuAutotypeAverage" Header="Average" IsCheckable="True" Click="menuAutotypeAverage_Click" />
+                <MenuItem x:Name="menuAutotypeSlow" Header="Potato" IsCheckable="True" Click="menuAutotypeSlow_Click" />
+                <MenuItem x:Name="menuAutotypeDisable" Header="Disable" IsCheckable="True" Click="menuAutotypeDisable_Click" />
+            </MenuItem>
+            <MenuItem x:Name="toolClipboardSync" Header="Clipboard (Receive Only)" Click="toolClipboardSync_Click" />
+            <MenuItem Header="Hacks">
+                <MenuItem x:Name="menuHacksKeyRelease" Header="Key release fix" Click="menuHacksKeyRelease_Click" IsCheckable="True" IsChecked="True" />
+                <MenuItem x:Name="menuHacksFastPrintScreen" Header="Fast Print Screen (uses more CPU)" Click="menuHacksFastPrintScreen_Click" IsCheckable="True" />
+                <MenuItem x:Name="menuHacksEarlyFrameAck" Header="Earlier Frame Acknowledgement" Click="menuHacksEarlyFrameAck_Click" IsCheckable="True" IsChecked="True" />
+            </MenuItem>
+            <MenuItem Header="Test">
+                <MenuItem x:Name="menuTestOverlay" Header="Overlay" Click="menuTestOverlay_Click" />
+            </MenuItem>
+        </Menu>
+        <Grid Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <TreeView x:Name="treeConnections"/>
+            <TextBox x:Name="txtLog" Grid.Column="1" Margin="5,0,0,0" VerticalScrollBarVisibility="Visible" IsReadOnly="True"/>
+        </Grid>
+    </DockPanel>
+</Window>
