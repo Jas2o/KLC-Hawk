@@ -27,6 +27,7 @@ namespace KLC_Hawk {
         //Need a better place for this as it's only used by the Remote Control module
         private List<KeycodeV2> listHeldMods; //Modifier keys, they can stay down between any keys
         private List<KeycodeV2> listHeldKeys; //Non-monifier keys, these should auto release any other non-modifier keys
+        private bool autotypeAlwaysConfirmed;
 
         public WsY2(LiveConnectSession session, int portY, string PathAndQuery) {
             //Type 2 - is started
@@ -125,16 +126,35 @@ namespace KLC_Hawk {
                                         tc.Join();
                                         Thread.Sleep(1);
 
-                                        if (text.Length < 51 && !text.Contains('\n') && !text.Contains('\r')) {
+                                        bool confirmed = false;
+                                        if (!text.Contains('\n') && !text.Contains('\r')) {
+                                            if (text.Length < 51 || autotypeAlwaysConfirmed) {
+                                                confirmed = true;
+                                            } else {
+                                                tc = new Thread(() => {
+                                                    WindowConfirmation winConfirm = new WindowConfirmation("You really want to autotype this?", text);
+                                                    winConfirm.Topmost = true;
+                                                    confirmed = (bool)winConfirm.ShowDialog();
+                                                    if (confirmed && (bool)winConfirm.chkDoNotAsk.IsChecked)
+                                                        autotypeAlwaysConfirmed = true;
+                                                });
+                                                tc.SetApartmentState(ApartmentState.STA);
+                                                tc.Start();
+                                                tc.Join();
+                                            }
+                                        }
+
+                                        if (confirmed) {
                                             Session.Parent.LogText("Attempt autotype of " + text, "autotype");
+
                                             int speedPreset = Session.Parent.AutoTypeSpeed;
                                             if (Session.IsMac)
                                                 speedPreset = 2;
                                             MITM.SendText(Client, text, speedPreset);
+
                                             //Session.Parent.Log(Side.MITM, PortY, PortY, "Send keys: " + text);
-                                        } else {
+                                        } else
                                             Session.Parent.LogText("Autotype blocked: too long or had a new line character");
-                                        }
                                     }
                                 }
                             }

@@ -82,6 +82,9 @@
     <Compile Include="HawkMITM\WsY2.cs" />
     <Compile Include="HawkMITM\WsZ.cs" />
     <Compile Include="SharkCapture\_Shark.cs" />
+    <Compile Include="WindowConfirmation.xaml.cs">
+      <DependentUpon>WindowConfirmation.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WindowException.xaml.cs">
       <DependentUpon>WindowException.xaml</DependentUpon>
     </Compile>
@@ -91,6 +94,10 @@
     <Compile Include="WindowShark.xaml.cs">
       <DependentUpon>WindowShark.xaml</DependentUpon>
     </Compile>
+    <Page Include="WindowConfirmation.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="WindowException.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
