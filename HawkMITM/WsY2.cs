@@ -255,6 +255,9 @@ namespace KLC_Hawk {
             if (doNothing) {
                 //Session.Parent.Log(Side.MITM, PortY, WebsocketB.PortB, "???");
             } else {
+                if (e.Data.Length == 0)
+                    return; //This happens when closing remote control
+
                 string messageY = Encoding.UTF8.GetString(e.Data);
                 if (messageY[0] == '{')
                     WebsocketB.Send(Client, messageY);

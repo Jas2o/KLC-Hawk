@@ -26,11 +26,14 @@ namespace KLC_Hawk {
             if (!Debugger.IsAttached) {
                 //Setup exception handling rather than closing rudely.
                 AppDomain.CurrentDomain.UnhandledException += (sender, args) => ShowUnhandledException(args.ExceptionObject as Exception, "AppDomain.CurrentDomain.UnhandledException");
-                TaskScheduler.UnobservedTaskException += (sender, args) => ShowUnhandledException(args.Exception, "TaskScheduler.UnobservedTaskException");
+                TaskScheduler.UnobservedTaskException += (sender, args) => {
+                    ShowUnhandledExceptionFromSrc(args.Exception, "TaskScheduler.UnobservedTaskException");
+                    args.SetObserved();
+                };
 
                 Dispatcher.UnhandledException += (sender, args) => {
                     args.Handled = true;
-                    ShowUnhandledException(args.Exception, "Dispatcher.UnhandledException");
+                    ShowUnhandledExceptionFromSrc(args.Exception, "Dispatcher.UnhandledException");
                 };
             }
 
@@ -45,6 +48,12 @@ namespace KLC_Hawk {
 
                 App.Current.Shutdown();
             }
+        }
+
+        public static void ShowUnhandledExceptionFromSrc(Exception e, string source) {
+            Application.Current.Dispatcher.Invoke((Action)delegate {
+                new WindowException(e, source + " - " + e.GetType().ToString()).Show();
+            });
         }
 
         void ShowUnhandledException(Exception e, string unhandledExceptionType) {
