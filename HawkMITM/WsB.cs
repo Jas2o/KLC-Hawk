@@ -174,11 +174,17 @@ namespace KLC_Hawk {
                         break;
 
                     case KaseyaMessageTypes.Clipboard:
-                        string clipboard = Encoding.ASCII.GetString(remaining); // Encoding.ASCII.GetString(e.Data, 5 + jLen, e.Data.Length - 5 - jLen);
-                        Session.Parent.LogText("Clipboard receive: [" + clipboard + "]", "clipboard");
+                        if (socket.ConnectionInfo.Path == "/app/staticimage") {
+                            //Thanks Kaseya
+                            Session.Parent.LogText("StaticImage just got a clipboard event, dropping it.");
+                            doNothing = true;
+                        } else {
+                            string clipboard = Encoding.ASCII.GetString(remaining); // Encoding.ASCII.GetString(e.Data, 5 + jLen, e.Data.Length - 5 - jLen);
+                            Session.Parent.LogText("Clipboard receive: [" + clipboard + "]", "clipboard");
 
-                        //if (!Session.Parent.EnableClipboardHostToRemote)
-                        //doNothing = true;
+                            //if (!Session.Parent.EnableClipboardHostToRemote)
+                            //doNothing = true;
+                        }
                         break;
 
                     default:
