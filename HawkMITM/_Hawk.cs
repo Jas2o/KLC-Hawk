@@ -39,6 +39,10 @@ namespace KLC_Hawk {
             actionLog = new Action<string>((x) => {
                 windowMain.Dispatcher.Invoke((Action)delegate {
                     windowMain.txtLog.AppendText(x + "\r\n");
+
+                    windowMain.txtLog.Focus();
+                    windowMain.txtLog.CaretIndex = windowMain.txtLog.Text.Length;
+                    windowMain.txtLog.ScrollToEnd();
                 });
             });
             queueLog = new AsyncProducerConsumerQueue<string>(actionLog);

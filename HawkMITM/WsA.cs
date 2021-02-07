@@ -85,6 +85,9 @@ namespace KLC_Hawk {
         }
 
         public void Send(string message) {
+            if (!ServerAsocket.IsAvailable)
+                return;
+
             try {
                 ServerAsocket.Send(message).Wait();
 

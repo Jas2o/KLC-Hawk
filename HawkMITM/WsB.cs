@@ -54,6 +54,7 @@ namespace KLC_Hawk {
                 };
                 socket.OnError = ex => {
                     Console.WriteLine("B Error: " + ex.ToString());
+                    Session.Parent.LogOld(Side.LiveConnect, PortB, "NA", "B Server Error: " + ex.ToString());
                 };
             });
         }
@@ -201,10 +202,16 @@ namespace KLC_Hawk {
         }
 
         public void Send(IWebSocketConnection socket, byte[] data) {
+            if (!socket.IsAvailable)
+                return;
+
             socket.Send(data);
         }
 
         public void Send(IWebSocketConnection socket, string message) {
+            if (!socket.IsAvailable)
+                return;
+
             socket.Send(message);
         }
 

@@ -46,6 +46,9 @@ namespace KLC_Hawk {
         }
 
         public void Send(string message) {
+            if (!WebsocketZ.Connected)
+                return;
+
             try {
                 WebsocketZ.SendAsync(message).Wait();
             } catch(Exception ex) {
@@ -58,8 +61,10 @@ namespace KLC_Hawk {
         }
 
         private void WebsocketZ_MessageReceived(object sender, MessageReceivedEventArgs e) {
-            if (e.MessageType == System.Net.WebSockets.WebSocketMessageType.Close)
+            if (e.MessageType == System.Net.WebSockets.WebSocketMessageType.Close) {
+                Session.Parent.LogText("Z received Close");
                 return;
+            }
 
             Session.Parent.LogOld(Side.LiveConnect, PortZ, Module, e.Data);
 

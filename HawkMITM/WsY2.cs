@@ -276,6 +276,9 @@ namespace KLC_Hawk {
         }
 
         public void Send(byte[] data) {
+            if (!WebsocketY.Connected)
+                return;
+
             try {
                 WebsocketY.SendAsync(data).Wait();
             } catch (Exception ex) {
@@ -284,6 +287,9 @@ namespace KLC_Hawk {
         }
 
         public void Send(string messageB) {
+            if (!WebsocketY.Connected)
+                return;
+
             try {
                 WebsocketY.SendAsync(messageB).Wait();
             } catch (Exception ex) {
