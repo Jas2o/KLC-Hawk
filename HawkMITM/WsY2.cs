@@ -20,6 +20,7 @@ namespace KLC_Hawk {
 
         private WatsonWsClient WebsocketY;
         private WsB WebsocketB;
+        private bool hadStarted;
         public IWebSocketConnection Client;
 
         private string PathAndQuery;
@@ -52,10 +53,11 @@ namespace KLC_Hawk {
             WebsocketY.ServerDisconnected += WebsocketY2_ServerDisconnected;
             WebsocketY.MessageReceived += WebsocketY2_MessageReceived;
 
-            WebsocketY.Start();
+            WebsocketY.Start();            
         }
 
         private void WebsocketY2_ServerConnected(object sender, EventArgs e) {
+            hadStarted = true;
             Session.Parent.LogText("Y2 Connect " + Module);
             Session.Parent.LogOld(Side.LiveConnect, PortY, "Y2", "Y2 Socket opened - " + PathAndQuery);
         }
@@ -276,8 +278,13 @@ namespace KLC_Hawk {
         }
 
         public void Send(byte[] data) {
-            if (!WebsocketY.Connected)
-                return;
+            while (!hadStarted) {
+                Session.Parent.LogText("[!] Y2 " + Module + " waiting");
+                Thread.Sleep(100);
+            }
+
+            //if (!WebsocketY.Connected)
+                //return;
 
             try {
                 WebsocketY.SendAsync(data).Wait();
@@ -287,8 +294,13 @@ namespace KLC_Hawk {
         }
 
         public void Send(string messageB) {
-            if (!WebsocketY.Connected)
-                return;
+            while(!hadStarted) {
+                Session.Parent.LogText("[!] Y2 " + Module + " waiting");
+                Thread.Sleep(100);
+            }
+
+            //if (!WebsocketY.Connected)
+                //return;
 
             try {
                 WebsocketY.SendAsync(messageB).Wait();

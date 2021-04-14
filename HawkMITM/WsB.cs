@@ -92,12 +92,17 @@ namespace KLC_Hawk {
             //!! -- Problem is it doesn't specify the websocketmessagetype
 
             WsY2 client2 = Session.listY2Client.Find(x => x.Client == socket);
+            if (client2 == null) {
+                //Session.Parent.Log(Side.MITM, PortY, PortY, "Y2 needs to know B's client!");
+                while (client2 == null) {
+                    Session.Parent.LogText("[!] B waiting");
+                    Thread.Sleep(100);
+                    client2 = Session.listY2Client.Find(x => x.Client == socket);
+                }
+                Session.Parent.LogText("B now knows!");
+            }
 
             bool doNothing = false;
-
-            if (client2 == null) {
-                doNothing = true;
-            }
 
             if (doNothing) {
             } else {
