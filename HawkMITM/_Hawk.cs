@@ -14,6 +14,7 @@ namespace KLC_Hawk {
 
         private NamedPipeListener<String> pipeListener;
         private LiveConnectSession lastSession;
+        private bool useHalfMode;
 
         //private FormShark formSharkCapture;
         //private FormOverlay formOverlay;
@@ -67,7 +68,7 @@ namespace KLC_Hawk {
         }
 
         private void PipeListener_MessageReceived(object sender, NamedPipeListenerMessageReceivedEventArgs<string> e) {
-            lastSession = LiveConnectSession.Create(int.Parse(e.Message), this);
+            lastSession = LiveConnectSession.Create(int.Parse(e.Message), this, useHalfMode);
         }
 
         private void PipeListener_Error(object sender, NamedPipeListenerErrorEventArgs e) {
@@ -143,6 +144,12 @@ namespace KLC_Hawk {
             if (lastSession == null)
                 return "";
             return lastSession.GetWiresharkFilterAEP();
+        }
+
+        public void ToggleHalfMode() {
+            //This intentionally breaks MITM, only useful for wireshark capture without proxying everything.
+            useHalfMode = !useHalfMode;
+            LogText("Half mode " + (useHalfMode ? "enabled" : "disabled") + " for next connection.");
         }
 
         /*

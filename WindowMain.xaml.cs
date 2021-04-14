@@ -135,5 +135,8 @@ namespace KLC_Hawk {
         }
         #endregion
 
+        private void menuFilterHalf_Click(object sender, RoutedEventArgs e) {
+            Hawk.ToggleHalfMode();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
@@ -18,11 +19,11 @@ namespace KLC_Hawk {
 
         //--
 
-        public LiveConnectSession(int portZ, Hawk parent) {
+        public LiveConnectSession(int portZ, Hawk parent, bool halfMode = false) {
             Parent = parent;
             PortZ = portZ;
 
-            WebsocketZ = new WsZ(this, portZ);
+            WebsocketZ = new WsZ(this, portZ, halfMode);
         }
 
         public static string GetWiresharkFilter(LiveConnectSession session) {
@@ -49,8 +50,8 @@ namespace KLC_Hawk {
 
         //--
 
-        public static LiveConnectSession Create(int portZ, Hawk parent) {
-            LiveConnectSession session = new LiveConnectSession(portZ, parent);
+        public static LiveConnectSession Create(int portZ, Hawk parent, bool halfMode = false) {
+            LiveConnectSession session = new LiveConnectSession(portZ, parent, halfMode);
             listSession.Add(session);
             parent.LogText("LCS Create/Add");
             return session;
@@ -64,5 +65,6 @@ namespace KLC_Hawk {
 
             return port;
         }
+
     }
 }

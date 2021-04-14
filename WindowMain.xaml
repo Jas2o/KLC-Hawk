@@ -25,6 +25,7 @@
                 <MenuItem x:Name="menuFilterAll" Header="Filter for all" Click="menuFilterAll_Click" />
                 <MenuItem x:Name="menuFilterLC" Header="Just Live Connect" Click="menuFilterLC_Click" />
                 <MenuItem x:Name="menuFilterAEP" Header="Just AdminEndPoint" Click="menuFilterAEP_Click" />
+                <MenuItem x:Name="menuFilterHalf" Header="Half MITM" Click="menuFilterHalf_Click" />
             </MenuItem>
             <MenuItem Header="Autotype">
                 <MenuItem x:Name="menuAutotypeFast" Header="Fast" IsCheckable="True" Click="menuAutotypeFast_Click" IsChecked="True"/>

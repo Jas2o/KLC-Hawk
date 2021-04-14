@@ -18,11 +18,13 @@ namespace KLC_Hawk {
         
         public int PortZ { get; private set; }
         private string Module;
+        private bool HalfMode;
 
-        public WsZ(LiveConnectSession session, int port) {
+        public WsZ(LiveConnectSession session, int port, bool halfMode = false) {
             Session = session;
             PortZ = port;
             Module = "controladmin";
+            HalfMode = halfMode;
 
             //LC Z - Live Connect found a free port
             Session.Parent.LogOld(Side.LiveConnect, PortZ, Module, "Z Received connection");
@@ -79,23 +81,24 @@ namespace KLC_Hawk {
                 //Session.PortY = json["data"]["connectPort"];
                 Session.Parent.LogOld(Side.MITM, portY, Module, "Y Port");
 
-                WsY1 wsy1 = new WsY1(Session, portY);
+                WsY1 wsy1 = new WsY1(Session, portY, HalfMode);
                 Session.listY1Client.Add(wsy1);
 
-                WsB wsb = new WsB(Session, wsy1); //This creates Y2
-                Session.listBsocket.Add(wsb);
+                if (!HalfMode) {
+                    WsB wsb = new WsB(Session, wsy1); //This creates Y2
+                    Session.listBsocket.Add(wsb);
 
-                //--
+                    json["data"]["connectPort"] = wsb.PortB; //Doesn't work with a string
 
-                json["data"]["connectPort"] = wsb.PortB; //Doesn't work with a string
+                    Session.Parent.LogOld(Side.MITM, 0, Module, string.Format("!#!#!#!#! Replaced Y:{0} with B:{1}", portY, wsb.PortB)); //"MITM"
+                    Session.Parent.LogText(string.Format("!#!#!#!#! Replaced Y:{0} with B:{1}", portY, wsb.PortB));
+                }
+
                 string newMessage = JsonConvert.SerializeObject(json);
 
                 Session.WebsocketA.Send(newMessage);
 
                 Session.Parent.LogOld(Side.LiveConnect, PortZ, Module, newMessage);
-
-                Session.Parent.LogOld(Side.MITM, 0, Module, string.Format("!#!#!#!#! Replaced Y:{0} with B:{1}", portY, wsb.PortB)); //"MITM"
-                Session.Parent.LogText(string.Format("!#!#!#!#! Replaced Y:{0} with B:{1}", portY, wsb.PortB));
                 //Parent.Log(Side.MITM, 0, 0, seq + " Z to A");
             } else {
                 Session.Parent.LogText("Z Else");
