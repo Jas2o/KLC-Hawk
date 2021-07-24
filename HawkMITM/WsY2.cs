@@ -14,20 +14,20 @@ using static LibKaseya.Enums;
 namespace KLC_Hawk {
     public class WsY2 {
 
-        private LiveConnectSession Session;
+        private readonly LiveConnectSession Session;
         public int PortY { get; private set; }
         public string Module { get; private set; }
 
-        private WatsonWsClient WebsocketY;
+        private readonly WatsonWsClient WebsocketY;
         private WsB WebsocketB;
         private bool hadStarted;
         public IWebSocketConnection Client;
 
-        private string PathAndQuery;
+        private readonly string PathAndQuery;
 
         //Need a better place for this as it's only used by the Remote Control module
-        private List<KeycodeV2> listHeldMods; //Modifier keys, they can stay down between any keys
-        private List<KeycodeV2> listHeldKeys; //Non-monifier keys, these should auto release any other non-modifier keys
+        private readonly List<KeycodeV2> listHeldMods; //Modifier keys, they can stay down between any keys
+        private readonly List<KeycodeV2> listHeldKeys; //Non-monifier keys, these should auto release any other non-modifier keys
         private bool autotypeAlwaysConfirmed;
 
         public WsY2(LiveConnectSession session, int portY, string PathAndQuery) {
@@ -59,12 +59,12 @@ namespace KLC_Hawk {
         private void WebsocketY2_ServerConnected(object sender, EventArgs e) {
             hadStarted = true;
             Session.Parent.LogText("Y2 Connect " + Module);
-            Session.Parent.LogOld(Side.LiveConnect, PortY, "Y2", "Y2 Socket opened - " + PathAndQuery);
+            Session.Parent.LogOld(Side.LiveConnect, PortY, Module, "Y2 Socket opened - " + PathAndQuery);
         }
 
         private void WebsocketY2_ServerDisconnected(object sender, EventArgs e) {
             Session.Parent.LogText("Y2 Disconnected " + Module);
-            Session.Parent.LogOld(Side.LiveConnect, PortY, "Y2", "Y2 Socket closed");
+            Session.Parent.LogOld(Side.LiveConnect, PortY, Module, "Y2 Socket closed");
 
             if (Module != "files")
                 Client.Close();
@@ -92,7 +92,7 @@ namespace KLC_Hawk {
                     Array.Copy(e.Data, 1, bLen, 0, 4);
                     Array.Reverse(bLen); //Endianness
                     int jLen = BitConverter.ToInt32(bLen, 0);
-                    string message = Encoding.ASCII.GetString(e.Data, 5, jLen);
+                    string message = Encoding.UTF8.GetString(e.Data, 5, jLen);
                     dynamic json = JsonConvert.DeserializeObject(message);
 
                     int remStart = 5 + jLen;
@@ -134,8 +134,9 @@ namespace KLC_Hawk {
                                                 confirmed = true;
                                             } else {
                                                 tc = new Thread(() => {
-                                                    WindowConfirmation winConfirm = new WindowConfirmation("You really want to autotype this?", text);
-                                                    winConfirm.Topmost = true;
+                                                    WindowConfirmation winConfirm = new WindowConfirmation("You really want to autotype this?", text) {
+                                                        Topmost = true
+                                                    };
                                                     confirmed = (bool)winConfirm.ShowDialog();
                                                     if (confirmed && (bool)winConfirm.chkDoNotAsk.IsChecked)
                                                         autotypeAlwaysConfirmed = true;
@@ -239,7 +240,7 @@ namespace KLC_Hawk {
                             break;
 
                         case KaseyaMessageTypes.Clipboard:
-                            string clipboard = Encoding.ASCII.GetString(remaining);
+                            string clipboard = Encoding.UTF8.GetString(remaining);
 
                             if (clipboard.Length == 0)
                                 doNothing = true;

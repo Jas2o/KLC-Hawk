@@ -14,12 +14,12 @@ using static LibKaseya.Enums;
 namespace KLC_Hawk {
     public class WsB {
 
-        private LiveConnectSession Session;
+        private readonly LiveConnectSession Session;
 
         //WatsonWsServer is not used due to issues with messages arriving out of order
-        private WebSocketServer ServerB;
+        private readonly WebSocketServer ServerB;
         public int PortB { get; private set; }
-        private WsY1 WebsocketY1;
+        private readonly WsY1 WebsocketY1;
 
         private VP8.Decoder decoder;
         private bool captureScreen;
@@ -71,7 +71,7 @@ namespace KLC_Hawk {
                 WsY1 client = Session.listY1Client.Find(x => x.Client == null);
                 if (client == null)
                     throw new Exception();
-                client.SetClient(this, socket);
+                client.SetClient(socket);
                 Session.Parent.LogOld(Side.AdminEndPoint, PortB, client.Module, "/control/agent");
                 //Do nothing much
             } else {
@@ -127,7 +127,7 @@ namespace KLC_Hawk {
                 Array.Copy(data, 1, bLen, 0, 4);
                 Array.Reverse(bLen); //Endianness
                 int jLen = BitConverter.ToInt32(bLen, 0);
-                string message = Encoding.ASCII.GetString(data, 5, jLen);
+                string message = Encoding.UTF8.GetString(data, 5, jLen);
                 dynamic json = JsonConvert.DeserializeObject(message);
 
                 int remStart = 5 + jLen;
@@ -185,7 +185,7 @@ namespace KLC_Hawk {
                             Session.Parent.LogText("StaticImage just got a clipboard event, dropping it.");
                             doNothing = true;
                         } else {
-                            string clipboard = Encoding.ASCII.GetString(remaining); // Encoding.ASCII.GetString(e.Data, 5 + jLen, e.Data.Length - 5 - jLen);
+                            string clipboard = Encoding.UTF8.GetString(remaining); // Encoding.ASCII.GetString(e.Data, 5 + jLen, e.Data.Length - 5 - jLen);
                             Session.Parent.LogText("Clipboard receive: [" + clipboard + "]", "clipboard");
 
                             //if (!Session.Parent.EnableClipboardHostToRemote)
@@ -207,6 +207,11 @@ namespace KLC_Hawk {
         }
 
         public void Send(IWebSocketConnection socket, byte[] data) {
+            //Needed to slow it down for when Finch uses Hawk
+            while (socket == null) {
+                Task.Delay(10);
+            }
+
             if (!socket.IsAvailable)
                 return;
 
@@ -214,6 +219,11 @@ namespace KLC_Hawk {
         }
 
         public void Send(IWebSocketConnection socket, string message) {
+            //Needed to slow it down for when Finch uses Hawk
+            while (socket == null) {
+                Task.Delay(10);
+            }
+
             if (!socket.IsAvailable)
                 return;
 

@@ -73,6 +73,7 @@ namespace KLC_Hawk {
             Process process = new Process();
             process.StartInfo.FileName = (File.Exists(file1) ? file1 : file2);
             process.StartInfo.Arguments = "-viewerport " + PortA;
+            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
             process.Start();
 
             //--
@@ -85,6 +86,11 @@ namespace KLC_Hawk {
         }
 
         public void Send(string message) {
+            //Needed to slow it down for when Finch uses Hawk
+            while (ServerAsocket == null) {
+                Task.Delay(10);
+            }
+
             if (!ServerAsocket.IsAvailable)
                 return;
 

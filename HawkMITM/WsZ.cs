@@ -13,12 +13,12 @@ using static LibKaseya.Enums;
 namespace KLC_Hawk {
     public class WsZ {
 
-        private LiveConnectSession Session;
-        private WatsonWsClient WebsocketZ;
+        private readonly LiveConnectSession Session;
+        private readonly WatsonWsClient WebsocketZ;
         
         public int PortZ { get; private set; }
-        private string Module;
-        private bool HalfMode;
+        private readonly string Module;
+        private readonly bool HalfMode;
 
         public WsZ(LiveConnectSession session, int port, bool halfMode = false) {
             Session = session;

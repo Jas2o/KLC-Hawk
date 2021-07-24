@@ -11,12 +11,12 @@ using static LibKaseya.Enums;
 namespace KLC_Hawk {
     public class WsY1 {
 
-        private LiveConnectSession Session;
+        private readonly LiveConnectSession Session;
         public int PortY { get; private set; }
         public string Module { get; private set; }
 
-        private WatsonWsClient WebsocketY;
-        private WsB WebsocketB;
+        private readonly WatsonWsClient WebsocketY;
+        //private WsB WebsocketB;
         public IWebSocketConnection Client;
         public int ClientPort;
 
@@ -69,8 +69,8 @@ namespace KLC_Hawk {
                 Client.Send(e.Data);
         }
 
-        public void SetClient(WsB wsB, IWebSocketConnection socket) {
-            WebsocketB = wsB;
+        public void SetClient(IWebSocketConnection socket) {
+            //WebsocketB = wsB;
             Client = socket;
         }
 

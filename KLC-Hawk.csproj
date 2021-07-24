@@ -35,11 +35,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Fleck, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fleck.1.1.0\lib\net45\Fleck.dll</HintPath>
+    <Reference Include="Fleck, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fleck.1.2.0\lib\net45\Fleck.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -58,8 +58,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>.\VP8.NET.dll</HintPath>
     </Reference>
-    <Reference Include="WatsonWebsocket, Version=2.2.0.10, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WatsonWebsocket.2.2.0.10\lib\net452\WatsonWebsocket.dll</HintPath>
+    <Reference Include="WatsonWebsocket, Version=2.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WatsonWebsocket.2.3.0\lib\net452\WatsonWebsocket.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />

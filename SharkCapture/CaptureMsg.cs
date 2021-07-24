@@ -38,7 +38,7 @@ namespace KLC_Hawk {
             int moduleLen = fs.ReadByte();
             byte[] moduleb = new byte[moduleLen];
             fs.Read(moduleb, 0, moduleLen);
-            Module = Encoding.ASCII.GetString(moduleb, 0, moduleLen);
+            Module = Encoding.UTF8.GetString(moduleb, 0, moduleLen);
 
             Type = (Datatype)fs.ReadByte();
 
@@ -80,7 +80,7 @@ namespace KLC_Hawk {
             Port = port;
             Module = module;
             Type = Datatype.String;
-            Data = Encoding.ASCII.GetBytes(message);
+            Data = Encoding.UTF8.GetBytes(message);
             DataLength = Data.Length;
 
             UpdateDisplayAndText();
@@ -98,15 +98,15 @@ namespace KLC_Hawk {
                 if (Data.Length > 2 && Data[0] == '{' && Data[Data.Length - 1] == '}') {
                     Type = Datatype.JSON;
                     Display = "b! JSON";
-                    Text = Encoding.ASCII.GetString(Data);
+                    Text = Encoding.UTF8.GetString(Data);
                 }
 
                 if (Data.Length > 6 && Data[5] == '{')
                     Type = Datatype.bJSON;
                 
             } else if (Type == Datatype.String) {
-                Display = Encoding.ASCII.GetString(Data);
-                Text = Encoding.ASCII.GetString(Data);
+                Display = Encoding.UTF8.GetString(Data);
+                Text = Encoding.UTF8.GetString(Data);
 
                 if (Display[0] == '{') {
                     Type = Datatype.JSON;
@@ -124,7 +124,7 @@ namespace KLC_Hawk {
                 Array.Copy(Data, 1, bLen, 0, 4);
                 Array.Reverse(bLen); //Endianness
                 int jLen = BitConverter.ToInt32(bLen, 0);
-                Text = Encoding.ASCII.GetString(Data, 5, jLen);
+                Text = Encoding.UTF8.GetString(Data, 5, jLen);
             }
 
             //-- Filtering
@@ -132,7 +132,7 @@ namespace KLC_Hawk {
                 FilterHideDefault = true;
 
             if (Type == Datatype.JSON) {
-                Text = Encoding.ASCII.GetString(Data);
+                Text = Encoding.UTF8.GetString(Data);
 
                 dynamic json = JsonConvert.DeserializeObject(Text);
                 Display += " " + (string)json["action"];
@@ -176,7 +176,7 @@ namespace KLC_Hawk {
 
         public byte[] ExportAsBytes() {
             byte[] dtb = BitConverter.GetBytes(Timestamp.ToBinary()); //8
-            byte[] modb = Encoding.ASCII.GetBytes(Module);
+            byte[] modb = Encoding.UTF8.GetBytes(Module);
             byte[] datalen = BitConverter.GetBytes(Data.Length);
             if (dtb.Length != 8 || datalen.Length != 4 || Module.Length > 100)
                 throw new Exception();
