@@ -190,8 +190,10 @@ namespace KLC_Hawk {
                                             Session.Parent.LogText("MITM release all modifiers", "keyrelease");
                                         }
                                     } else {
-                                        //Session.Parent.Invoke(new Action(() => Session.Parent.Activate()));
-                                        MITM.HandleKey(keykaseyaUN);
+                                        if ((bool)json["pressed"]) {
+                                            Session.Parent.ActivateWindow();
+                                            MITM.HandleKey(keykaseyaUN);
+                                        }
                                     }
                                 } else {
 

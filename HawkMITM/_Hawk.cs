@@ -69,6 +69,12 @@ namespace KLC_Hawk {
             }
         }
 
+        public void ActivateWindow() {
+            windowMain.Dispatcher.Invoke((Action)delegate {
+                windowMain.Activate();
+            });
+        }
+
         private void PipeListener_MessageReceived(object sender, NamedPipeListenerMessageReceivedEventArgs<string> e) {
             lastSession = LiveConnectSession.Create(int.Parse(e.Message), this, useHalfMode);
         }
