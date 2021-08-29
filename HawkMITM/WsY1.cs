@@ -42,12 +42,12 @@ namespace KLC_Hawk {
 
         private void WebsocketY1_ServerConnected(object sender, EventArgs e) {
             Session.Parent.LogText("Y1 Connected " + Module);
-            Session.Parent.LogOld(Side.AdminEndPoint, PortY, Module, "Socket opened");
+            Session.Parent.LogOld(Side.LiveConnect, PortY, Module, "Socket opened");
         }
 
         private void WebsocketY1_ServerDisconnected(object sender, EventArgs e) {
             Session.Parent.LogText("Y1 Disconnected " + Module);
-            Session.Parent.LogOld(Side.AdminEndPoint, PortY, Module, "Socket closed");
+            Session.Parent.LogOld(Side.LiveConnect, PortY, Module, "Socket closed");
         }
 
         private void WebsocketY1_MessageReceived(object sender, MessageReceivedEventArgs e) {
@@ -60,13 +60,15 @@ namespace KLC_Hawk {
             }
 
             //string messageY = Encoding.UTF8.GetString(e.Data);
-            //Session.Parent.Log(Side.AdminEndPoint, PortY, WebsocketB.PortB, e.Data);
 
             if (e.MessageType == System.Net.WebSockets.WebSocketMessageType.Text) {
                 string messageY = Encoding.UTF8.GetString(e.Data);
+                Session.Parent.LogOld(Side.LiveConnect, PortY, Module, messageY);
                 Client.Send(messageY);
-            } else if (e.MessageType == System.Net.WebSockets.WebSocketMessageType.Binary)
+            } else if (e.MessageType == System.Net.WebSockets.WebSocketMessageType.Binary) {
                 Client.Send(e.Data);
+                Session.Parent.LogOld(Side.LiveConnect, PortY, Module, e.Data);
+            }
         }
 
         public void SetClient(IWebSocketConnection socket) {

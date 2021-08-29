@@ -91,21 +91,30 @@ namespace KLC_Hawk {
             //if (eB.HttpRequest.Url.PathAndQuery == "/control/agent") {
             //!! -- Problem is it doesn't specify the websocketmessagetype
 
-            WsY2 client2 = Session.listY2Client.Find(x => x.Client == socket);
-            if (client2 == null) {
-                //Session.Parent.Log(Side.MITM, PortY, PortY, "Y2 needs to know B's client!");
-                while (client2 == null) {
-                    Session.Parent.LogText("[!] B waiting");
-                    Thread.Sleep(100);
-                    client2 = Session.listY2Client.Find(x => x.Client == socket);
-                }
-                Session.Parent.LogText("B now knows!");
-            }
+            if (socket.ConnectionInfo.Path == "/control/agent") {
+                //Added because of RC Private new behavior
+                WsY1 client = Session.listY1Client.Last();
+                if (client == null)
+                    throw new Exception();
 
-            bool doNothing = false;
-
-            if (doNothing) {
+                client.Send(message);
+                Session.Parent.LogOld(Side.AdminEndPoint, PortB, client.Module, message);
             } else {
+                WsY2 client2 = Session.listY2Client.Find(x => x.Client == socket);
+                if (client2 == null) {
+                    //Session.Parent.Log(Side.MITM, PortY, PortY, "Y2 needs to know B's client!");
+                    bool saidWaiting = false;
+                    while (client2 == null) {
+                        if (!saidWaiting) {
+                            Session.Parent.LogText("[!] B waiting");
+                            saidWaiting = true;
+                        }
+                        Thread.Sleep(100);
+                        client2 = Session.listY2Client.Find(x => x.Client == socket);
+                    }
+                    Session.Parent.LogText("B now knows!");
+                }
+
                 client2.Send(message);
                 Session.Parent.LogOld(Side.AdminEndPoint, PortB, client2.Module, message);
             }
