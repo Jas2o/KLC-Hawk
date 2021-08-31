@@ -76,24 +76,39 @@ namespace KLC_Hawk {
         static readonly BinaryFormatter formatter = new BinaryFormatter();
 
         NamedPipeServerStream pipeServer;
+        private bool IsUserUnique;
 
         /// <summary>Initializes a new instance of <see cref="NamedPipeListener{TMessage}" /> using the specified <paramref name="pipeName" />.</summary>
         /// <param name="pipeName">The name of the named pipe that will be used to listen on.</param>
-        public NamedPipeListener(String pipeName) {
-            this.PipeName = pipeName;
+        public NamedPipeListener(String pipeName, bool userUnique) {
+            IsUserUnique = userUnique;
+
+            if (IsUserUnique)
+                PipeName = pipeName + "-" + System.Security.Principal.WindowsIdentity.GetCurrent().Name.Replace("\\", "-");
+            else
+                PipeName = pipeName;
         }
 
         /// <summary>Initializes a new instance of <see cref="NamedPipeListener{TMessage}" /> using the default pipe name.</summary>
         /// <remarks>The default pipe name is the full name of the type of the instance.</remarks>
         public NamedPipeListener()
-            : this(DEFAULT_PIPENAME) { }
+            : this(DEFAULT_PIPENAME, false) { }
 
         /// <summary>The name of the named pipe that will be used to listen on.</summary>
         public String PipeName { get; private set; }
 
         /// <summary>Starts listening on the named pipe specified for the instance.</summary>
         internal void Start() {
-            if (pipeServer == null) pipeServer = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            if (pipeServer == null) {
+                if (IsUserUnique) {
+                    PipeSecurity pipeSecurity = new PipeSecurity();
+                    pipeSecurity.AddAccessRule(new PipeAccessRule(System.Security.Principal.WindowsIdentity.GetCurrent().Name, PipeAccessRights.FullControl, System.Security.AccessControl.AccessControlType.Allow));
+
+                    pipeServer = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous, 0, 0, pipeSecurity);
+                } else {
+                    pipeServer = new NamedPipeServerStream(PipeName, PipeDirection.In, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+                }
+            }
 
             try { pipeServer.BeginWaitForConnection(new AsyncCallback(PipeConnectionCallback), null); } catch (Exception ex) { this.OnError(NamedPipeListenerErrorType.BeginWaitForConnection, ex); }
         }
@@ -139,14 +154,14 @@ namespace KLC_Hawk {
             }
         }
 
+        /*
         private void OnMessageReceived(TMessage message) {
-            this.OnMessageReceived(new NamedPipeListenerMessageReceivedEventArgs<TMessage>(message));
+            OnMessageReceived(new NamedPipeListenerMessageReceivedEventArgs<TMessage>(message));
         }
+        */
 
         protected virtual void OnMessageReceived(NamedPipeListenerMessageReceivedEventArgs<TMessage> e) {
-            if (this.MessageReceived != null) {
-                this.MessageReceived(this, e);
-            }
+            MessageReceived?.Invoke(this, e);
         }
 
         private void OnError(NamedPipeListenerErrorType errorType, Exception ex) {
@@ -154,9 +169,7 @@ namespace KLC_Hawk {
         }
 
         protected virtual void OnError(NamedPipeListenerErrorEventArgs e) {
-            if (this.Error != null) {
-                this.Error(this, e);
-            }
+            Error?.Invoke(this, e);
         }
 
         void IDisposable.Dispose() {
@@ -172,13 +185,16 @@ namespace KLC_Hawk {
         /// <summary>Sends the specified <paramref name="message" /> to the default named pipe for the message.</summary>        
         /// <param name="message">The message to send.</param>
         public static void SendMessage(TMessage message) {
-            NamedPipeListener<TMessage>.SendMessage(DEFAULT_PIPENAME, message);
+            NamedPipeListener<TMessage>.SendMessage(DEFAULT_PIPENAME, false, message);
         }
 
         /// <summary>Sends the specified <paramref name="message" /> to the specified named pipe.</summary>
         /// <param name="pipeName">The name of the named pipe the message will be sent to.</param>
         /// <param name="message">The message to send.</param>
-        public static void SendMessage(String pipeName, TMessage message) {
+        public static void SendMessage(string pipeName, bool userUnique, TMessage message) {
+            if (userUnique)
+                pipeName = pipeName + "\\" + System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+
             using (var pipeClient = new NamedPipeClientStream(".", pipeName, PipeDirection.Out, PipeOptions.None)) {
                 pipeClient.Connect();
 

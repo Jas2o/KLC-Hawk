@@ -50,7 +50,7 @@ namespace KLC_Hawk {
             });
             queueLog = new AsyncProducerConsumerQueue<string>(actionLog);
 
-            pipeListener = new NamedPipeListener<String>("KLCMITM");
+            pipeListener = new NamedPipeListener<String>("KLCMITM", true);
             pipeListener.MessageReceived += PipeListener_MessageReceived;
             pipeListener.Error += PipeListener_Error;
             pipeListener.Start();

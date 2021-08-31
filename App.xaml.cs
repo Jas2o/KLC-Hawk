@@ -43,7 +43,7 @@ namespace KLC_Hawk {
             if (!createdNew) {
                 string[] args = Environment.GetCommandLineArgs();
                 if (args.Length > 2) { //Console=1, Window=2
-                    NamedPipeListener<String>.SendMessage("KLCMITM", args[2]);
+                    NamedPipeListener<String>.SendMessage("KLCMITM", true, args[2]);
                 }
 
                 App.Current.Shutdown();
