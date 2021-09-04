@@ -193,7 +193,7 @@ namespace KLC_Hawk {
         /// <param name="message">The message to send.</param>
         public static void SendMessage(string pipeName, bool userUnique, TMessage message) {
             if (userUnique)
-                pipeName = pipeName + "\\" + System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+                pipeName = pipeName + "-" + System.Security.Principal.WindowsIdentity.GetCurrent().Name.Replace("\\", "-");
 
             using (var pipeClient = new NamedPipeClientStream(".", pipeName, PipeDirection.Out, PipeOptions.None)) {
                 pipeClient.Connect();
