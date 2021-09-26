@@ -51,6 +51,10 @@
                 IsReadOnly="True"
                 ItemsSource="{Binding ListCapture, Mode=OneWay}"
                 SelectionChanged="dataGridCapture_SelectionChanged">
+                <DataGrid.Resources>
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{Binding Path=Color, Source={x:Static SystemColors.HighlightBrush}}" />
+                    <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="White" />
+                </DataGrid.Resources>
                 <DataGrid.Columns>
                     <DataGridTextColumn Binding="{Binding Number, FallbackValue=Number}" Header="No" />
                     <DataGridTextColumn Binding="{Binding Time, FallbackValue=Time}" Header="Time" />
