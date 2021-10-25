@@ -97,8 +97,8 @@ namespace KLC_Hawk {
                 if (client == null)
                     throw new Exception();
 
-                client.Send(message);
                 Session.Parent.LogOld(Side.AdminEndPoint, PortB, client.Module, message);
+                client.Send(message);
             } else {
                 WsY2 client2 = Session.listY2Client.Find(x => x.Client == socket);
                 if (client2 == null) {
@@ -115,8 +115,8 @@ namespace KLC_Hawk {
                     Session.Parent.LogText("B now knows!");
                 }
 
-                client2.Send(message);
                 Session.Parent.LogOld(Side.AdminEndPoint, PortB, client2.Module, message);
+                client2.Send(message);
             }
         }
 
@@ -210,8 +210,8 @@ namespace KLC_Hawk {
 
             if (doNothing) {
             } else {
-                client2.Send(data);
                 Session.Parent.LogOld(Side.AdminEndPoint, PortB, client2.Module, data);
+                client2.Send(data);
             }
         }
 
@@ -233,8 +233,10 @@ namespace KLC_Hawk {
                 Task.Delay(10);
             }
 
-            if (!socket.IsAvailable)
+            if (!socket.IsAvailable) {
+                Session.Parent.LogText("WsB - Send - Socket not available");
                 return;
+            }
 
             socket.Send(message);
         }

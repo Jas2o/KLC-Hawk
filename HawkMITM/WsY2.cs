@@ -93,7 +93,13 @@ namespace KLC_Hawk {
                     Array.Reverse(bLen); //Endianness
                     int jLen = BitConverter.ToInt32(bLen, 0);
                     string message = Encoding.UTF8.GetString(e.Data, 5, jLen);
-                    dynamic json = JsonConvert.DeserializeObject(message);
+                    dynamic json;
+                    try {
+                        json = JsonConvert.DeserializeObject(message);
+                    } catch(Exception ex) {
+                        Session.Parent.LogText("============\r\nEXCEPTION Y2: " + ex.ToString() + "\r\n============\r\n" + message + "\r\n============\r\n" + BitConverter.ToString(e.Data).Replace("-", "") + "\r\n============");
+                        return;
+                    }
 
                     int remStart = 5 + jLen;
                     int remLength = e.Data.Length - remStart;
@@ -213,8 +219,8 @@ namespace KLC_Hawk {
                                                     continue;
 
                                                 string sendjson = "{\"keyboard_layout_handle\":\"0\",\"keyboard_layout_local\":false,\"lock_states\":2,\"pressed\":false,\"usb_keycode\":" + held.USBKeyCode + ",\"virtual_key\":" + held.JavascriptKeyCode + "}";
-                                                int jsonLen = sendjson.Length;
                                                 byte[] jsonBuffer = System.Text.Encoding.UTF8.GetBytes(sendjson);
+                                                int jsonLen = jsonBuffer.Length;
 
                                                 byte[] tosend = new byte[jsonLen + 5];
                                                 tosend[0] = (byte)KaseyaMessageTypes.Keyboard;

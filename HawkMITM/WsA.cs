@@ -91,13 +91,14 @@ namespace KLC_Hawk {
                 Task.Delay(10);
             }
 
-            if (!ServerAsocket.IsAvailable)
+            if (!ServerAsocket.IsAvailable) {
+                Session.Parent.LogText("WsA - Send - Socket not available");
                 return;
+            }
 
             try {
-                ServerAsocket.Send(message).Wait();
-
                 Session.Parent.LogOld(Side.LiveConnect, PortA, Module, message);
+                ServerAsocket.Send(message).Wait();
             } catch (Exception ex) {
                 Session.Parent.LogText(ex.ToString());
             }
