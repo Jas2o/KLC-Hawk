@@ -8,9 +8,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-//cd C:\Program Files\Kaseya Live Connect-MITM\
-//mklink /H Kaseya.AdminEndpoint.exe "\EIT\Code\KaseyaAlternative\KLC-Hawk\bin\Debug\KLC-Hawk.exe"
-//mklink /H WatsonWebsocket.dll "\EIT\Code\KaseyaAlternative\KLC-Hawk\bin\Debug\WatsonWebsocket.dll"
+//cd C:\Users\username\source\repos\KLC-Dev\KLC-Hawk\bin\Debug
+
+//LOCAL APP DATA
+//mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.exe" "KLC-Hawk.exe"
+//mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\WatsonWebsocket.dll" "WatsonWebsocket.dll"
+//mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\Fleck.dll" "Fleck.dll"
+//mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\Newtonsoft.Json.dll" "Newtonsoft.Json.dll"
+//mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\VP8.NET.dll" "VP8.NET.dll"
+//And the others
+
+//PROGRAM FILES
+//mklink /H "C:\Program Files\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.exe" "KLC-Hawk.exe"
+//mklink /H "C:\Program Files\Kaseya Live Connect-MITM\WatsonWebsocket.dll" "WatsonWebsocket.dll"
+//mklink /H "C:\Program Files\Kaseya Live Connect-MITM\Fleck.dll" "Fleck.dll"
+//mklink /H "C:\Program Files\Kaseya Live Connect-MITM\Newtonsoft.Json.dll" "Newtonsoft.Json.dll"
+//mklink /H "C:\Program Files\Kaseya Live Connect-MITM\VP8.NET.dll" "VP8.NET.dll"
 //And the others
 
 namespace KLC_Hawk {

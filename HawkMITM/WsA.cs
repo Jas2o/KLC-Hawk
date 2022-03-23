@@ -68,13 +68,31 @@ namespace KLC_Hawk {
             });
 
             //A - Run AdminEndpoint (my port A)
-            string file1 = @"C:\Program Files\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.org.exe";
-            string file2 = @"C:\Program Files\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.exe";
+
             Process process = new Process();
-            process.StartInfo.FileName = (File.Exists(file1) ? file1 : file2);
-            process.StartInfo.Arguments = "-viewerport " + PortA;
-            process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            process.Start();
+
+            string[] files = new string[] {
+                @"C:\Program Files\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.org.exe",
+                @"C:\Program Files\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.exe",
+                Environment.ExpandEnvironmentVariables(@"%localappdata%\Apps\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.org.exe"),
+                Environment.ExpandEnvironmentVariables(@"%localappdata%\Apps\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.exe")
+            };
+
+            foreach (string file in files)
+            {
+                if (File.Exists(file))
+                {
+                    process.StartInfo.FileName = file;
+                    break;
+                }
+            }
+
+            if (process.StartInfo.FileName.Length > 0)
+            {
+                process.StartInfo.Arguments = "-viewerport " + PortA;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.Start();
+            }
 
             //--
 

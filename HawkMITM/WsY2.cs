@@ -189,11 +189,11 @@ namespace KLC_Hawk {
                                             WebsocketB.CaptureNextScreen();
                                     } else if (keykaseyaUN.Key == Keys.Pause) {
                                         if (!(bool)json["pressed"]) {
+                                            Session.Parent.LogText("MITM release all modifiers", "keyrelease");
                                             foreach (int jskey in KeycodeV2.ModifiersJS) {
                                                 KeycodeV2 key = KeycodeV2.List.Find(x => x.JavascriptKeyCode == jskey);
                                                 WebsocketB.Send(Client, MITM.GetSendKey(key, false));
                                             }
-                                            Session.Parent.LogText("MITM release all modifiers", "keyrelease");
                                         }
                                     } else {
                                         if ((bool)json["pressed"]) {
@@ -269,6 +269,8 @@ namespace KLC_Hawk {
                 if (e.Data.Length == 0)
                     return; //This happens when closing remote control
 
+                Session.Parent.LogOld(Side.LiveConnect, PortY, Module, e.Data); //Slow
+
                 string messageY = Encoding.UTF8.GetString(e.Data);
                 if (messageY[0] == '{')
                     WebsocketB.Send(Client, messageY);
@@ -276,8 +278,6 @@ namespace KLC_Hawk {
                 else
                     WebsocketB.Send(Client, e.Data);
                 //Session.ServerB.SendAsync(Client, e.Data);
-
-                Session.Parent.LogOld(Side.LiveConnect, PortY, Module, e.Data); //Slow
             }
         }
 

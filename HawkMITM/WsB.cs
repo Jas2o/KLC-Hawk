@@ -53,6 +53,8 @@ namespace KLC_Hawk {
                     ServerB_BinaryReceived(socket, byteB);
                 };
                 socket.OnError = ex => {
+                    //System.IO.File.WriteAllBytes("lastData.bin", lastData);
+
                     Console.WriteLine("B Error: " + ex.ToString());
                     Session.Parent.LogOld(Side.LiveConnect, PortB, "NA", "B Server Error: " + ex.ToString());
                 };
@@ -157,6 +159,11 @@ namespace KLC_Hawk {
                             Session.IsMac = true;
                         break;
 
+                    case KaseyaMessageTypes.Mouse:
+                        //This seems to be a 9.5.8007.17759 thing.
+                        doNothing = true;
+                        break;
+
                     case KaseyaMessageTypes.Video:
                         if(Session.Parent.EnablePrintScreenHack || captureScreen) {
                             if (decoder == null)
@@ -215,6 +222,9 @@ namespace KLC_Hawk {
             }
         }
 
+        //private byte[] lastData;
+        //private string lastMessage;
+
         public void Send(IWebSocketConnection socket, byte[] data) {
             //Needed to slow it down for when Finch uses Hawk
             while (socket == null) {
@@ -223,6 +233,8 @@ namespace KLC_Hawk {
 
             if (!socket.IsAvailable)
                 return;
+
+            //lastData = data;
 
             socket.Send(data);
         }
@@ -237,6 +249,8 @@ namespace KLC_Hawk {
                 Session.Parent.LogText("WsB - Send - Socket not available");
                 return;
             }
+
+            //lastMessage = message;
 
             socket.Send(message);
         }
