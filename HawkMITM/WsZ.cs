@@ -47,6 +47,11 @@ namespace KLC_Hawk {
             Session.WebsocketA = new WsA(Session);
         }
 
+        public void Stop()
+        {
+            WebsocketZ.Stop();
+        }
+
         public void Send(string message) {
             if (!WebsocketZ.Connected)
                 return;
@@ -59,7 +64,7 @@ namespace KLC_Hawk {
         }
 
         private void WebsocketZ_ServerDisconnected(object sender, EventArgs e) {
-            Session.Parent.LogOld(Side.LiveConnect, PortZ, Module, "Z Socket closed: " + e.ToString());
+            Session.Parent.LogOld(Side.LiveConnect, PortZ, Module, "Z Socket disconnect");
         }
 
         private void WebsocketZ_MessageReceived(object sender, MessageReceivedEventArgs e) {
@@ -104,7 +109,7 @@ namespace KLC_Hawk {
                 Session.Parent.LogText("Z Else");
 
                 while(Session.WebsocketA == null) {
-                    Task.Delay(10);
+                    Task.Delay(10).Wait();
                 }
 
                 Session.WebsocketA.Send(message);

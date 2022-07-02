@@ -12,7 +12,7 @@ namespace KLC_Hawk {
 
         private WindowMain windowMain;
 
-        private NamedPipeListener<String> pipeListener;
+        private NamedPipeListener pipeListener;
         private LiveConnectSession lastSession;
         private bool useHalfMode;
 
@@ -50,7 +50,7 @@ namespace KLC_Hawk {
             });
             queueLog = new AsyncProducerConsumerQueue<string>(actionLog);
 
-            pipeListener = new NamedPipeListener<String>("KLCMITM", true);
+            pipeListener = new NamedPipeListener("KLCMITM", true);
             pipeListener.MessageReceived += PipeListener_MessageReceived;
             pipeListener.Error += PipeListener_Error;
             pipeListener.Start();
@@ -120,6 +120,49 @@ namespace KLC_Hawk {
             return;
 
             windowMain.WindowSharkCapture.Shark.AddCapture(side, port, module, message);
+        }
+
+        public void DropA()
+        {
+            foreach(LiveConnectSession session in LiveConnectSession.listSession)
+            {
+                session.WebsocketA.Stop();
+            }
+        }
+
+        public void DropB()
+        {
+            foreach (LiveConnectSession session in LiveConnectSession.listSession)
+            {
+                foreach(WsB b in session.listBsocket)
+                {
+                    b.Stop();
+                }
+            }
+        }
+
+        public void DropY()
+        {
+            foreach (LiveConnectSession session in LiveConnectSession.listSession)
+            {
+                foreach (WsY2 y in session.listY2Client)
+                {
+                    y.Stop();
+                }
+
+                foreach (WsY1 y in session.listY1Client)
+                {
+                    y.Stop();
+                }
+            }
+        }
+
+        public void DropZ()
+        {
+            foreach (LiveConnectSession session in LiveConnectSession.listSession)
+            {
+                session.WebsocketZ.Stop();
+            }
         }
 
         /*

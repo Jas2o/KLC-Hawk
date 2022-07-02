@@ -16,7 +16,8 @@ namespace KLC_Hawk {
         private LiveConnectSession Session;
 
         private WebSocketServer ServerA;
-        private IWebSocketConnection ServerAsocket;
+        private List<IWebSocketConnection> listServerAsocket;
+        private IWebSocketConnection ServerAsocket; //last
         public int PortA { get; private set; }
         private string Module;
 
@@ -30,10 +31,12 @@ namespace KLC_Hawk {
 
             //A - new WebSocketServer (my port A)
             ServerA = new WebSocketServer("ws://0.0.0.0:" + PortA);
+            listServerAsocket = new List<IWebSocketConnection>();
 
             //ServerA.RestartAfterListenError = true;
             ServerA.Start(socket => {
                 ServerAsocket = socket;
+                listServerAsocket.Add(socket);
 
                 socket.OnOpen = () => {
                     Session.Parent.LogText("A Open (server port: " + PortA + ") " + socket.ConnectionInfo.Path);
@@ -42,13 +45,40 @@ namespace KLC_Hawk {
                 socket.OnClose = () => {
                     Session.Parent.LogText("A Close");
                     Session.Parent.LogOld(Side.LiveConnect, PortA, Module, "A Server close");
+
+                    //Session.WebsocketZ.Stop();
+                    //ServerA.ListenerSocket.Close();
                 };
                 socket.OnMessage = message => {
                     //Session.Parent.LogText("A Message to Z");
                     Session.Parent.LogOld(Side.LiveConnect, PortA, Module, message);
+                    //Parent.Log(PortA "Z", "Sent: " + message, PortA);
 
                     Session.WebsocketZ.Send(message);
-                    //Parent.Log(PortA "Z", "Sent: " + message, PortA);
+
+                    if (message.Contains("PeerOffline"))
+                    {
+                        Session.Parent.LogText("A: Endpoint is offline.");
+
+                        //Finch
+                        //Session.Callback?.Invoke(EPStatus.PeerOffline);
+                        //Task.Delay(10000).Wait(); // 10 seconds
+                        //ServerOnOpen(socket);
+
+                        //socket.Close();
+                    } else if(message.Contains("PeerToPeerFailure"))
+                    {
+                        Session.Parent.LogText("A: PeerToPeerFailure");
+                        //socket.Close();
+
+                        //Finch
+                        //Session.Callback?.Invoke(EPStatus.PeerToPeerFailure);
+                        //Task.Delay(10000).Wait(); // 10 seconds
+                        //ServerOnOpen(socket);
+                    }
+                    else {
+                        Session.Parent.LogText("Unexpected A message: " + message);
+                    }
                 };
                 socket.OnPing = byteA => {
                     //Session.Parent.LogText("A Ping");
@@ -73,9 +103,9 @@ namespace KLC_Hawk {
 
             string[] files = new string[] {
                 @"C:\Program Files\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.org.exe",
-                @"C:\Program Files\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.exe",
+                @"C:\Program Files\Kaseya Live Connect\Kaseya.AdminEndpoint.exe",
                 Environment.ExpandEnvironmentVariables(@"%localappdata%\Apps\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.org.exe"),
-                Environment.ExpandEnvironmentVariables(@"%localappdata%\Apps\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.exe")
+                Environment.ExpandEnvironmentVariables(@"%localappdata%\Apps\Kaseya Live Connect\Kaseya.AdminEndpoint.exe")
             };
 
             foreach (string file in files)
@@ -90,7 +120,8 @@ namespace KLC_Hawk {
             if (process.StartInfo.FileName.Length > 0)
             {
                 process.StartInfo.Arguments = "-viewerport " + PortA;
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+                process.StartInfo.CreateNoWindow = true;
+                //process.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
                 process.Start();
             }
 
@@ -103,10 +134,19 @@ namespace KLC_Hawk {
             //Tell AdminEndPoint
         }
 
+        public void Stop()
+        {
+            foreach (IWebSocketConnection con in listServerAsocket)
+                con.Close();
+
+            //ServerAsocket.Close();
+            //ServerA.ListenerSocket.Close();
+        }
+
         public void Send(string message) {
             //Needed to slow it down for when Finch uses Hawk
             while (ServerAsocket == null) {
-                Task.Delay(10);
+                Task.Delay(10).Wait();
             }
 
             if (!ServerAsocket.IsAvailable) {

@@ -147,7 +147,7 @@ namespace KLC_Hawk {
                     case KaseyaMessageTypes.FrameAcknowledgement:
                     case KaseyaMessageTypes.Video:
                     case KaseyaMessageTypes.ThumbnailResult:
-                        FilterHideDefault = true;
+                        FilterHideDefault = false;
                         break;
 
                     case KaseyaMessageTypes.Clipboard:
@@ -172,6 +172,8 @@ namespace KLC_Hawk {
                         break;
                 }
             }
+
+            //FilterHideDefault = false; //For testing
         }
 
         public byte[] ExportAsBytes() {

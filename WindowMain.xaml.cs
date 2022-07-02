@@ -138,5 +138,25 @@ namespace KLC_Hawk {
         private void menuFilterHalf_Click(object sender, RoutedEventArgs e) {
             Hawk.ToggleHalfMode();
         }
+
+        private void menuDropA_Click(object sender, RoutedEventArgs e)
+        {
+            Hawk.DropA();
+        }
+
+        private void menuDropB_Click(object sender, RoutedEventArgs e)
+        {
+            Hawk.DropB();
+        }
+
+        private void menuDropY_Click(object sender, RoutedEventArgs e)
+        {
+            Hawk.DropY();
+        }
+
+        private void menuDropZ_Click(object sender, RoutedEventArgs e)
+        {
+            Hawk.DropZ();
+        }
     }
 }

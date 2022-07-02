@@ -8,23 +8,28 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
-//cd C:\Users\username\source\repos\KLC-Dev\KLC-Hawk\bin\Debug
+/*
+cd C:\Users\username\source\repos\KLC-Dev\KLC-Hawk\bin\Debug\net6.0-windows
 
 //LOCAL APP DATA
-//mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.exe" "KLC-Hawk.exe"
-//mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\WatsonWebsocket.dll" "WatsonWebsocket.dll"
-//mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\Fleck.dll" "Fleck.dll"
-//mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\Newtonsoft.Json.dll" "Newtonsoft.Json.dll"
-//mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\VP8.NET.dll" "VP8.NET.dll"
+mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.exe" "KLC-Hawk.exe"
+mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\KLC-Hawk.dll" "KLC-Hawk.dll"
+mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\WatsonWebsocket.dll" "WatsonWebsocket.dll"
+mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\Fleck.dll" "Fleck.dll"
+mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\Newtonsoft.Json.dll" "Newtonsoft.Json.dll"
+mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\RestSharp.dll" "RestSharp.dll"
+mklink /H "%localappdata%\Apps\Kaseya Live Connect-MITM\VP8.NET.dll" "VP8.NET.dll"
 //And the others
 
 //PROGRAM FILES
-//mklink /H "C:\Program Files\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.exe" "KLC-Hawk.exe"
-//mklink /H "C:\Program Files\Kaseya Live Connect-MITM\WatsonWebsocket.dll" "WatsonWebsocket.dll"
-//mklink /H "C:\Program Files\Kaseya Live Connect-MITM\Fleck.dll" "Fleck.dll"
-//mklink /H "C:\Program Files\Kaseya Live Connect-MITM\Newtonsoft.Json.dll" "Newtonsoft.Json.dll"
-//mklink /H "C:\Program Files\Kaseya Live Connect-MITM\VP8.NET.dll" "VP8.NET.dll"
+mklink /H "C:\Program Files\Kaseya Live Connect-MITM\Kaseya.AdminEndpoint.exe" "KLC-Hawk.exe"
+mklink /H "C:\Program Files\Kaseya Live Connect-MITM\WatsonWebsocket.dll" "WatsonWebsocket.dll"
+mklink /H "C:\Program Files\Kaseya Live Connect-MITM\Fleck.dll" "Fleck.dll"
+mklink /H "C:\Program Files\Kaseya Live Connect-MITM\Newtonsoft.Json.dll" "Newtonsoft.Json.dll"
+mklink /H "C:\Program Files\Kaseya Live Connect-MITM\RestSharp.dll" "RestSharp.dll"
+mklink /H "C:\Program Files\Kaseya Live Connect-MITM\VP8.NET.dll" "VP8.NET.dll"
 //And the others
+*/
 
 namespace KLC_Hawk {
     /// <summary>
@@ -40,7 +45,7 @@ namespace KLC_Hawk {
                 //Setup exception handling rather than closing rudely.
                 AppDomain.CurrentDomain.UnhandledException += (sender, args) => ShowUnhandledException(args.ExceptionObject as Exception, "AppDomain.CurrentDomain.UnhandledException");
                 TaskScheduler.UnobservedTaskException += (sender, args) => {
-                    ShowUnhandledExceptionFromSrc(args.Exception, "TaskScheduler.UnobservedTaskException");
+                    //ShowUnhandledExceptionFromSrc(args.Exception, "TaskScheduler.UnobservedTaskException");
                     args.SetObserved();
                 };
 
@@ -56,7 +61,7 @@ namespace KLC_Hawk {
             if (!createdNew) {
                 string[] args = Environment.GetCommandLineArgs();
                 if (args.Length > 2) { //Console=1, Window=2
-                    NamedPipeListener<String>.SendMessage("KLCMITM", true, args[2]);
+                    NamedPipeListener.SendMessage("KLCMITM", true, args[2]);
                 }
 
                 App.Current.Shutdown();

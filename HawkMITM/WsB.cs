@@ -18,6 +18,7 @@ namespace KLC_Hawk {
 
         //WatsonWsServer is not used due to issues with messages arriving out of order
         private readonly WebSocketServer ServerB;
+        private IWebSocketConnection ServerBsocket;
         public int PortB { get; private set; }
         private readonly WsY1 WebsocketY1;
 
@@ -35,7 +36,7 @@ namespace KLC_Hawk {
             ServerB = new WebSocketServer("ws://0.0.0.0:" + PortB);
 
             ServerB.Start(socket => {
-                //ServerBsocket = socket;
+                ServerBsocket = socket;
 
                 socket.OnOpen = () => {
                     ServerB_ClientConnected(socket);
@@ -61,6 +62,13 @@ namespace KLC_Hawk {
             });
         }
 
+        public void Stop()
+        {
+            if(ServerBsocket != null)
+                ServerBsocket.Close();
+            ServerB.ListenerSocket.Close();
+        }
+
         private void ServerB_ClientConnected(IWebSocketConnection socket) {
             //Module = e.HttpRequest.Url.PathAndQuery.Split('/')[2];
             Session.Parent.LogText("B Connect (server port: " + PortB + ") " + socket.ConnectionInfo.Path);
@@ -84,8 +92,13 @@ namespace KLC_Hawk {
         }
 
         private void ServerB_ClientDisconnected(IWebSocketConnection socket) {
-            Session.Parent.LogText("B Close " + socket.ConnectionInfo.Path);
+            Session.Parent.LogText("B Close port " + PortB + " - " + socket.ConnectionInfo.Path);
             Session.Parent.LogOld(Side.MITM, PortB, "B", "B Server Close " + PortB + " - " + socket.ConnectionInfo.Path);
+
+            if(socket.ConnectionInfo.Path == "/control/agent")
+            {
+                Session.Restart();
+            }
         }
 
         private void ServerB_MessageReceived(IWebSocketConnection socket, string message) {
@@ -124,12 +137,27 @@ namespace KLC_Hawk {
 
         private void ServerB_BinaryReceived(IWebSocketConnection socket, byte[] data) {
             WsY2 client2 = Session.listY2Client.Find(x => x.Client == socket);
+            if (client2 == null)
+            {
+                //Session.Parent.Log(Side.MITM, PortY, PortY, "Y2 needs to know B's client!");
+                bool saidWaiting = false;
+                while (client2 == null)
+                {
+                    if (!saidWaiting)
+                    {
+                        Session.Parent.LogText("[!] B waiting");
+                        saidWaiting = true;
+                    }
+                    Thread.Sleep(100);
+                    client2 = Session.listY2Client.Find(x => x.Client == socket);
+                }
+                Session.Parent.LogText("B now knows!");
+            }
 
             bool doNothing = false;
-
-            if (client2 == null) {
-                doNothing = true;
-            }
+            //if (client2 == null) {
+                //doNothing = true;
+            //}
 
             if (data.Length > 6 && data[5] == '{') {
                 //Maybe some MITM?
@@ -228,21 +256,25 @@ namespace KLC_Hawk {
         public void Send(IWebSocketConnection socket, byte[] data) {
             //Needed to slow it down for when Finch uses Hawk
             while (socket == null) {
-                Task.Delay(10);
+                Task.Delay(10).Wait();
             }
 
             if (!socket.IsAvailable)
+            {
+                Session.Parent.LogText("WsB - SendB - Socket not available");
                 return;
+            }
 
             //lastData = data;
 
             socket.Send(data);
+            return;
         }
 
         public void Send(IWebSocketConnection socket, string message) {
             //Needed to slow it down for when Finch uses Hawk
             while (socket == null) {
-                Task.Delay(10);
+                Task.Delay(10).Wait();
             }
 
             if (!socket.IsAvailable) {

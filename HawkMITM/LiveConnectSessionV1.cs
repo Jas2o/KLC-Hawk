@@ -26,6 +26,18 @@ namespace KLC_Hawk {
             WebsocketZ = new WsZ(this, portZ, halfMode);
         }
 
+        public void Restart()
+        {
+            //While this does make the disconnect screen appear, it also doesn't reconnect.
+            //foreach (WsB b in listBsocket) b.Stop();
+            foreach (WsY2 y2 in listY2Client) y2.Stop();
+            foreach (WsY1 y1 in listY1Client) y1.Stop();
+            
+            //Apparently we should be able to reuse Z/A
+            //WebsocketA.Stop();
+            //WebsocketZ.Restart();
+        }
+
         public static string GetWiresharkFilter(LiveConnectSession session) {
             return string.Format("{0} || {1}", session.GetWiresharkFilterKLC(), session.GetWiresharkFilterAEP());
         }

@@ -56,6 +56,11 @@ namespace KLC_Hawk {
             WebsocketY.Start();            
         }
 
+        public void Stop()
+        {
+            WebsocketY.Stop();
+        }
+
         private void WebsocketY2_ServerConnected(object sender, EventArgs e) {
             hadStarted = true;
             Session.Parent.LogText("Y2 Connect " + Module);

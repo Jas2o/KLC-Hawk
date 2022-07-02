@@ -40,6 +40,11 @@ namespace KLC_Hawk {
             WebsocketY.Start();
         }
 
+        public void Stop()
+        {
+            WebsocketY.Stop();
+        }
+
         private void WebsocketY1_ServerConnected(object sender, EventArgs e) {
             Session.Parent.LogText("Y1 Connected " + Module);
             Session.Parent.LogOld(Side.LiveConnect, PortY, Module, "Socket opened");
@@ -53,8 +58,27 @@ namespace KLC_Hawk {
         private void WebsocketY1_MessageReceived(object sender, MessageReceivedEventArgs e) {
             if (Client == null) {
                 Session.Parent.LogText("Y1 Needs to know B's client!");
+                int attempts = 0;
                 while (Client == null) {
                     Thread.Sleep(100);
+                    attempts++;
+                    if (attempts > 100)
+                    {
+                        Session.Parent.LogText("Y1 aborting");
+                        if (e.MessageType == System.Net.WebSockets.WebSocketMessageType.Text)
+                        {
+                            string messageY = Encoding.UTF8.GetString(e.Data);
+                            Session.Parent.LogOld(Side.LiveConnect, PortY, Module+"_ABORTED", messageY);
+                            //Client.Send(messageY);
+                        }
+                        else if (e.MessageType == System.Net.WebSockets.WebSocketMessageType.Binary)
+                        {
+                            //Client.Send(e.Data);
+                            Session.Parent.LogOld(Side.LiveConnect, PortY, Module + "_ABORTED", e.Data);
+                        }
+                        //this.Stop();
+                        return;
+                    }
                 }
                 Session.Parent.LogText("Y1 now knows!");
             }
