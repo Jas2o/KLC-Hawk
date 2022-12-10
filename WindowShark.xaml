@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ext="clr-namespace:System.Windows.Controls.Extensions"
     xmlns:local="clr-namespace:KLC_Hawk"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="KLC-Shark"
@@ -10,35 +11,82 @@
     Height="450"
     Loaded="Window_Loaded"
     mc:Ignorable="d">
-    <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="File">
-                <MenuItem
+    <Window.Resources>
+        <CollectionViewSource x:Key="GridItems" Source="{Binding ListCapture}" />
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <ToolBarTray IsLocked="True">
+            <ToolBar x:Name="toolBar">
+                <Label Content="File:" IsEnabled="False" />
+                <Button
                     x:Name="menuFileOpen"
                     Click="menuFileOpen_Click"
-                    Header="Open File" />
-                <MenuItem
+                    Content="Open File" />
+                <Button
                     x:Name="menuFileSave"
                     Click="menuFileSave_Click"
-                    Header="Save As" />
-            </MenuItem>
+                    Content="Save As" />
+                <Separator />
 
-            <MenuItem Header="Capture">
-                <MenuItem
+                <Label Content="Capture:" IsEnabled="False" />
+                <Button
                     x:Name="menuCapturePause"
                     Click="menuCapturePause_Click"
-                    Header="Pause" />
-                <MenuItem
+                    Content="Pause" />
+                <Button
                     x:Name="menuCaptureContinue"
                     Click="menuCaptureContinue_Click"
-                    Header="Continue" />
-            </MenuItem>
-            <MenuItem
-                x:Name="menuHexCopy"
-                Click="menuHexCopy_Click"
-                Header="Copy Hex" />
-        </Menu>
-        <Grid>
+                    Content="Continue" />
+                <Separator />
+                <Button
+                    x:Name="menuHexCopy"
+                    Click="menuHexCopy_Click"
+                    Content="Copy Hex"
+                    Visibility="Collapsed" />
+            </ToolBar>
+            <ToolBar Background="#FFFFFFFF" Band="1">
+                <Label Content="Filters:" IsEnabled="false" />
+                <Button
+                    x:Name="menuFilterRefresh"
+                    Click="menuFilterRefresh_Click"
+                    Content="Refresh"
+                    FontWeight="Bold" />
+                <ToggleButton
+                    x:Name="menuFilterDashboard"
+                    Content="Dashboard"
+                    IsChecked="{Binding Path=FilterDashboard}" />
+                <ToggleButton
+                    x:Name="menuFilterThumbnailResult"
+                    Content="ThumbnailResult"
+                    IsChecked="{Binding Path=FilterThumbnailResult}" />
+                <Separator />
+                <ToggleButton
+                    x:Name="menuFilterPing"
+                    Content="Ping"
+                    IsChecked="{Binding Path=FilterPing}" />
+                <ToggleButton
+                    x:Name="menuFilterFrameAcknowledgement"
+                    Content="FrameAck"
+                    IsChecked="{Binding Path=FilterFrameAcknowledgement}" />
+                <ToggleButton
+                    x:Name="menuFilterVideo"
+                    Content="Video"
+                    IsChecked="{Binding Path=FilterVideo}" />
+                <ToggleButton
+                    x:Name="menuFilterCursorImage"
+                    Content="CursorImage"
+                    IsChecked="{Binding Path=FilterCursorImage}" />
+                <ToggleButton
+                    x:Name="menuFilterMouseMove"
+                    Content="MouseMove"
+                    IsChecked="{Binding Path=FilterMouseMove}" />
+            </ToolBar>
+        </ToolBarTray>
+        <Grid Grid.Row="1">
             <Grid.RowDefinitions>
                 <RowDefinition />
                 <RowDefinition Height="5" />
@@ -49,7 +97,7 @@
                 AlternatingRowBackground="#FFE6E6E6"
                 AutoGenerateColumns="False"
                 IsReadOnly="True"
-                ItemsSource="{Binding ListCapture, Mode=OneWay}"
+                ItemsSource="{Binding Source={StaticResource GridItems}}"
                 SelectionChanged="dataGridCapture_SelectionChanged">
                 <DataGrid.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="{Binding Path=Color, Source={x:Static SystemColors.HighlightBrush}}" />
@@ -84,5 +132,5 @@
                 </TabItem>
             </TabControl>
         </Grid>
-    </DockPanel>
+    </Grid>
 </Window>

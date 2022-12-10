@@ -181,71 +181,80 @@ namespace KLC_Hawk {
 
                             if (Session.Parent.EnableKeyboardReleaseHack) {
 
-                                //Using the USB keycode is unreliable
-                                KeycodeV2 keykaseya = KeycodeV2.List.Find(x => x.JavascriptKeyCode == (int)json["virtual_key"]);
-                                if (keykaseya == null) {
-                                    doNothing = true;
+                                //Hasn't been updated to KeycodeV3
 
-                                    KeycodeV2 keykaseyaUN = KeycodeV2.ListUnhandled.Find(x => x.JavascriptKeyCode == (int)json["virtual_key"]);
-                                    if (keykaseyaUN == null)
-                                        Session.Parent.LogText("Unknown key JS: " + json["virtual_key"] + " - USB: " + json["usb_keycode"]);
-                                    else if (keykaseyaUN.Key == Keys.PrintScreen) {
-                                        if (!(bool)json["pressed"])
-                                            WebsocketB.CaptureNextScreen();
-                                    } else if (keykaseyaUN.Key == Keys.Pause) {
-                                        if (!(bool)json["pressed"]) {
-                                            Session.Parent.LogText("MITM release all modifiers", "keyrelease");
-                                            foreach (int jskey in KeycodeV2.ModifiersJS) {
-                                                KeycodeV2 key = KeycodeV2.List.Find(x => x.JavascriptKeyCode == jskey);
-                                                WebsocketB.Send(Client, MITM.GetSendKey(key, false));
+                                try
+                                {
+                                    //Using the USB keycode is unreliable
+                                    KeycodeV2 keykaseya = KeycodeV2.List.Find(x => x.USBKeyCode == (int)json["usb_keycode"]);
+                                    if (keykaseya == null) {
+                                        doNothing = true;
+
+                                        KeycodeV2 keykaseyaUN = KeycodeV2.ListUnhandled.Find(x => x.USBKeyCode == (int)json["usb_keycode"]);
+                                        if (keykaseyaUN == null)
+                                            Session.Parent.LogText("Unknown key (USB): " + json["usb_keycode"]);
+                                        else if (keykaseyaUN.Key == Keys.PrintScreen) {
+                                            if (!(bool)json["pressed"])
+                                                WebsocketB.CaptureNextScreen();
+                                        } else if (keykaseyaUN.Key == Keys.Pause) {
+                                            if (!(bool)json["pressed"]) {
+                                                Session.Parent.LogText("MITM release all modifiers", "keyrelease");
+                                                foreach (int jskey in KeycodeV2.ModifiersJS) {
+                                                    KeycodeV2 key = KeycodeV2.List.Find(x => x.JavascriptKeyCode == jskey);
+                                                    WebsocketB.Send(Client, MITM.GetSendKey(key, false));
+                                                }
                                             }
-                                        }
-                                    } else {
-                                        if ((bool)json["pressed"]) {
-                                            Session.Parent.ActivateWindow();
-                                            MITM.HandleKey(keykaseyaUN);
-                                        }
-                                    }
-                                } else {
-
-                                    bool keyIsMod = KeycodeV2.ModifiersJS.Contains(keykaseya.JavascriptKeyCode);
-
-                                    if ((bool)json["pressed"]) {
-                                        if (keyIsMod) {
-                                            if (!listHeldMods.Contains(keykaseya))
-                                                listHeldMods.Add(keykaseya);
-                                            else
-                                                doNothing = true;
                                         } else {
-                                            //doMITM = true;
-
-                                            foreach (KeycodeV2 held in listHeldKeys) {
-                                                if (held == keykaseya)
-                                                    continue;
-
-                                                string sendjson = "{\"keyboard_layout_handle\":\"0\",\"keyboard_layout_local\":false,\"lock_states\":2,\"pressed\":false,\"usb_keycode\":" + held.USBKeyCode + ",\"virtual_key\":" + held.JavascriptKeyCode + "}";
-                                                byte[] jsonBuffer = System.Text.Encoding.UTF8.GetBytes(sendjson);
-                                                int jsonLen = jsonBuffer.Length;
-
-                                                byte[] tosend = new byte[jsonLen + 5];
-                                                tosend[0] = (byte)KaseyaMessageTypes.Keyboard;
-                                                tosend[4] = (byte)jsonLen;
-                                                Array.Copy(jsonBuffer, 0, tosend, 5, jsonLen);
-
-                                                Session.Parent.LogText("MITM release key: " + held.Display, "keyrelease");
-                                                WebsocketB.Send(Client, tosend);
-                                                //Session.Parent.LogOld(Side.MITM, PortY, PortY, tosend);
+                                            if ((bool)json["pressed"]) {
+                                                Session.Parent.ActivateWindow();
+                                                MITM.HandleKey(keykaseyaUN);
                                             }
-                                            listHeldKeys.Clear();
-
-                                            listHeldKeys.Add(keykaseya);
                                         }
                                     } else {
-                                        if (keyIsMod)
-                                            listHeldMods.Remove(keykaseya);
-                                        else
-                                            listHeldKeys.Remove(keykaseya);
+
+                                        bool keyIsMod = KeycodeV2.ModifiersJS.Contains(keykaseya.JavascriptKeyCode);
+
+                                        if ((bool)json["pressed"]) {
+                                            if (keyIsMod) {
+                                                if (!listHeldMods.Contains(keykaseya))
+                                                    listHeldMods.Add(keykaseya);
+                                                else
+                                                    doNothing = true;
+                                            } else {
+                                                //doMITM = true;
+
+                                                foreach (KeycodeV2 held in listHeldKeys) {
+                                                    if (held == keykaseya)
+                                                        continue;
+
+                                                    string sendjson = "{\"keyboard_layout_handle\":\"0\",\"keyboard_layout_local\":false,\"lock_states\":2,\"pressed\":false,\"usb_keycode\":" + held.USBKeyCode + ",\"virtual_key\":" + held.JavascriptKeyCode + "}";
+                                                    byte[] jsonBuffer = System.Text.Encoding.UTF8.GetBytes(sendjson);
+                                                    int jsonLen = jsonBuffer.Length;
+
+                                                    byte[] tosend = new byte[jsonLen + 5];
+                                                    tosend[0] = (byte)KaseyaMessageTypes.Keyboard;
+                                                    tosend[4] = (byte)jsonLen;
+                                                    Array.Copy(jsonBuffer, 0, tosend, 5, jsonLen);
+
+                                                    Session.Parent.LogText("MITM release key: " + held.Display, "keyrelease");
+                                                    WebsocketB.Send(Client, tosend);
+                                                    //Session.Parent.LogOld(Side.MITM, PortY, PortY, tosend);
+                                                }
+                                                listHeldKeys.Clear();
+
+                                                listHeldKeys.Add(keykaseya);
+                                            }
+                                        } else {
+                                            if (keyIsMod)
+                                                listHeldMods.Remove(keykaseya);
+                                            else
+                                                listHeldKeys.Remove(keykaseya);
+                                        }
                                     }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine(ex.ToString());
                                 }
                             } //End key release hack
                               //End keyboard message

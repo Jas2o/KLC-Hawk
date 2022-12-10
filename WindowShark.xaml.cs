@@ -125,5 +125,22 @@ namespace KLC_Hawk {
             }
         }
 
+        private void menuFilterRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            List<string> filters = new List<string>();
+            if (Shark.FilterDashboard) filters.Add("Dashboard");
+            if (Shark.FilterThumbnailResult) filters.Add("ThumbnailResult");
+            if (Shark.FilterPing) filters.Add("Ping");
+            if (Shark.FilterFrameAcknowledgement) filters.Add("FrameAcknowledgement");
+            if (Shark.FilterVideo) filters.Add("Video");
+            if (Shark.FilterCursorImage) filters.Add("CursorImage");
+            if (Shark.FilterMouseMove) filters.Add("MouseMove");
+
+            ListCollectionView collectionView = (ListCollectionView)CollectionViewSource.GetDefaultView(dataGridCapture.ItemsSource);
+            collectionView.Filter = new Predicate<object>(x =>
+                //!((CaptureMsg)x).FilterHideDefault
+                !filters.Contains(((CaptureMsg)x).FilterReason)
+            );
+        }
     }
 }

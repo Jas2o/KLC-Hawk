@@ -21,6 +21,15 @@ namespace KLC_Hawk {
 
         public ObservableCollection<CaptureMsg> ListCapture { get; set; }
 
+        public bool FilterDashboard { get; set; } = true;
+        public bool FilterThumbnailResult { get; set; } = true;
+        //--
+        public bool FilterPing { get; set; } = true;
+        public bool FilterFrameAcknowledgement { get; set; } = true;
+        public bool FilterVideo { get; set; } = true;
+        public bool FilterCursorImage { get; set; } = true;
+        public bool FilterMouseMove { get; set; } = true;
+
         //public BindingList<CaptureMsg> listMessageKLC = new BindingList<CaptureMsg>();
         //private Action<CaptureMsg> actionLog;
         //public AsyncProducerConsumerQueue<CaptureMsg> queueLog;

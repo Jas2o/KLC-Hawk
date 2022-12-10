@@ -22,6 +22,7 @@ namespace KLC_Hawk {
         public Double Time { get; private set; }
 
         public bool FilterHideDefault { get; private set; }
+        public string FilterReason { get; private set; }
 
         public CaptureMsg(FileStream fs, int number, DateTime timeCompare) {
             Number = number;
@@ -93,17 +94,24 @@ namespace KLC_Hawk {
 
         public void UpdateDisplayAndText() {
             if (Type == Datatype.Binary) {
-                Display = "Binary length " + DataLength;
-
-                if (Data.Length > 2 && Data[0] == '{' && Data[Data.Length - 1] == '}') {
-                    Type = Datatype.JSON;
-                    Display = "b! JSON";
-                    Text = Encoding.UTF8.GetString(Data);
+                if (Data.Length == 1)
+                {
+                    KaseyaMessageTypes kmtype = (KaseyaMessageTypes)Data[0];
+                    Display += "Binary " + kmtype.ToString();
                 }
+                else
+                {
+                    Display = "Binary length " + DataLength;
+                    if (Data.Length > 2 && Data[0] == '{' && Data[Data.Length - 1] == '}')
+                    {
+                        Type = Datatype.JSON;
+                        Display = "b! JSON";
+                        Text = Encoding.UTF8.GetString(Data);
+                    }
 
-                if (Data.Length > 6 && Data[5] == '{')
-                    Type = Datatype.bJSON;
-                
+                    if (Data.Length > 6 && Data[5] == '{')
+                        Type = Datatype.bJSON;
+                }
             } else if (Type == Datatype.String) {
                 Display = Encoding.UTF8.GetString(Data);
                 Text = Encoding.UTF8.GetString(Data);
@@ -129,7 +137,10 @@ namespace KLC_Hawk {
 
             //-- Filtering
             if (Module == "dashboard")
+            {
                 FilterHideDefault = true;
+                FilterReason = "Dashboard";
+            }
 
             if (Type == Datatype.JSON) {
                 Text = Encoding.UTF8.GetString(Data);
@@ -146,8 +157,10 @@ namespace KLC_Hawk {
                     case KaseyaMessageTypes.Ping:
                     case KaseyaMessageTypes.FrameAcknowledgement:
                     case KaseyaMessageTypes.Video:
+                    case KaseyaMessageTypes.CursorImage:
                     case KaseyaMessageTypes.ThumbnailResult:
-                        FilterHideDefault = false;
+                        FilterHideDefault = true;
+                        FilterReason = kmtype.ToString();
                         break;
 
                     case KaseyaMessageTypes.Clipboard:
@@ -156,7 +169,10 @@ namespace KLC_Hawk {
                     case KaseyaMessageTypes.Mouse:
                         KaseyaMouseEventTypes kmet = (KaseyaMouseEventTypes)(int)json["type"];
                         if (kmet == KaseyaMouseEventTypes.Move)
+                        {
                             FilterHideDefault = true;
+                            FilterReason = "MouseMove";
+                        }
                         Display += " " + kmet;
                         break;
 

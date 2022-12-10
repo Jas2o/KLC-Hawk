@@ -45,18 +45,19 @@ namespace KLC_Hawk {
                 //Setup exception handling rather than closing rudely.
                 AppDomain.CurrentDomain.UnhandledException += (sender, args) => ShowUnhandledException(args.ExceptionObject as Exception, "AppDomain.CurrentDomain.UnhandledException");
                 TaskScheduler.UnobservedTaskException += (sender, args) => {
-                    //ShowUnhandledExceptionFromSrc(args.Exception, "TaskScheduler.UnobservedTaskException");
+                    //if(false)
+                        //ShowUnhandledExceptionFromSrc(args.Exception, "TaskScheduler.UnobservedTaskException");
                     args.SetObserved();
                 };
 
                 Dispatcher.UnhandledException += (sender, args) => {
                     args.Handled = true;
-                    ShowUnhandledExceptionFromSrc(args.Exception, "Dispatcher.UnhandledException");
+                    //if(false)
+                        //ShowUnhandledExceptionFromSrc(args.Exception, "Dispatcher.UnhandledException");
                 };
             }
 
-            bool createdNew;
-            mutex = new Mutex(true, appName, out createdNew);
+            mutex = new Mutex(true, appName, out bool createdNew);
 
             if (!createdNew) {
                 string[] args = Environment.GetCommandLineArgs();
@@ -74,7 +75,7 @@ namespace KLC_Hawk {
             });
         }
 
-        void ShowUnhandledException(Exception e, string unhandledExceptionType) {
+        public static void ShowUnhandledException(Exception e, string unhandledExceptionType) {
             new WindowException(e, unhandledExceptionType).Show(); //, Debugger.IsAttached
         }
 
