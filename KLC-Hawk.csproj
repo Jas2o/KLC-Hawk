@@ -16,7 +16,7 @@
     <PackageReference Include="nucs.JsonSettings" Version="1.0.7" />
     <PackageReference Include="RestSharp" Version="106.15.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="WatsonWebsocket" Version="2.3.0" />
+    <PackageReference Include="WatsonWebsocket" Version="2.3.5" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="VP8.NET">
