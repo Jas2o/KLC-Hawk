@@ -8,7 +8,14 @@
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <PlatformTarget>x64</PlatformTarget>
+    <BaseOutputPath>..\Build\</BaseOutputPath>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="DropdownButton.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DropdownButton.cs" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fleck" Version="1.2.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
