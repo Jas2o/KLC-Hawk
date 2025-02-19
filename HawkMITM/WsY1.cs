@@ -87,7 +87,7 @@ namespace KLC_Hawk {
                 Session.Parent.LogOld(Side.LiveConnect, PortY, Module, messageY);
                 Client.Send(messageY);
             } else if (e.MessageType == System.Net.WebSockets.WebSocketMessageType.Binary) {
-                Client.Send(e.Data);
+                Client.Send(e.Data.ToArray());
                 Session.Parent.LogOld(Side.LiveConnect, PortY, Module, e.Data);
             }
         }

@@ -89,27 +89,28 @@ namespace KLC_Hawk {
 
             if (Module == "remotecontrol") {
                 #region MITM
-                if (e.Data.Length > 6 && e.Data[5] == '{') {
+                if (e.Data.Count > 6 && e.Data[5] == '{') {
                     //Maybe some MITM?
                     KaseyaMessageTypes kmtype = (KaseyaMessageTypes)e.Data[0];
                     byte[] bLen = new byte[4];
-                    Array.Copy(e.Data, 1, bLen, 0, 4);
+
+                    e.Data.Slice(1, 4).CopyTo(bLen);
                     Array.Reverse(bLen); //Endianness
                     int jLen = BitConverter.ToInt32(bLen, 0);
-                    string message = Encoding.UTF8.GetString(e.Data, 5, jLen);
+                    string message = Encoding.UTF8.GetString(e.Data.ToArray(), 5, jLen);
                     dynamic json;
                     try {
                         json = JsonConvert.DeserializeObject(message);
                     } catch(Exception ex) {
-                        Session.Parent.LogText("============\r\nEXCEPTION Y2: " + ex.ToString() + "\r\n============\r\n" + message + "\r\n============\r\n" + BitConverter.ToString(e.Data).Replace("-", "") + "\r\n============");
+                        Session.Parent.LogText("============\r\nEXCEPTION Y2: " + ex.ToString() + "\r\n============\r\n" + message + "\r\n============\r\n" + BitConverter.ToString(e.Data.ToArray()).Replace("-", "") + "\r\n============");
                         return;
                     }
 
                     int remStart = 5 + jLen;
-                    int remLength = e.Data.Length - remStart;
+                    int remLength = e.Data.Count - remStart;
                     byte[] remaining = new byte[remLength];
                     if (remLength > 0)
-                        Array.Copy(e.Data, remStart, remaining, 0, remLength);
+                        e.Data.Slice(remStart, remLength).CopyTo(remaining);
 
                     switch (kmtype) {
                         case KaseyaMessageTypes.FrameAcknowledgement:
@@ -279,7 +280,7 @@ namespace KLC_Hawk {
             if (doNothing) {
                 //Session.Parent.Log(Side.MITM, PortY, WebsocketB.PortB, "???");
             } else {
-                if (e.Data.Length == 0)
+                if (e.Data.Count == 0)
                     return; //This happens when closing remote control
 
                 Session.Parent.LogOld(Side.LiveConnect, PortY, Module, e.Data); //Slow
@@ -289,7 +290,7 @@ namespace KLC_Hawk {
                     WebsocketB.Send(Client, messageY);
                 //Session.ServerB.SendAsync(Client, messageY);
                 else
-                    WebsocketB.Send(Client, e.Data);
+                    WebsocketB.Send(Client, e.Data.ToArray());
                 //Session.ServerB.SendAsync(Client, e.Data);
             }
         }

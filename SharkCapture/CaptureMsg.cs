@@ -14,7 +14,7 @@ namespace KLC_Hawk {
         public string Module { get; private set; }
         public Datatype Type { get; private set; }
         public int DataLength { get; private set; }
-        public byte[] Data { get; private set; }
+        public ArraySegment<byte> Data { get; private set; }
 
         public int Number { get; set; }
         public string Display { get; private set; } //Shown in table
@@ -45,8 +45,9 @@ namespace KLC_Hawk {
 
             fs.Read(datalen, 0, 4);
             DataLength = BitConverter.ToInt32(datalen, 0);
-            Data = new byte[DataLength];
-            fs.Read(Data, 0, DataLength);
+            byte[] fsData = new byte[DataLength];
+            fs.Read(fsData, 0, DataLength);
+            Data = fsData;
 
             UpdateDisplayAndText();
 
@@ -56,7 +57,7 @@ namespace KLC_Hawk {
                 Time = (Timestamp - timeCompare).TotalSeconds;
         }
 
-        public CaptureMsg(int number, DateTime timeCompare, Side side, int port, string module, byte[] data) {
+        public CaptureMsg(int number, DateTime timeCompare, Side side, int port, string module, ArraySegment<byte> data) {
             Number = number;
             Side = side;
             Timestamp = DateTime.Now;
@@ -64,7 +65,7 @@ namespace KLC_Hawk {
             Module = module;
             Type = Datatype.Binary;
             Data = data;
-            DataLength = Data.Length;
+            DataLength = Data.Count;
 
             UpdateDisplayAndText();
 
@@ -82,7 +83,7 @@ namespace KLC_Hawk {
             Module = module;
             Type = Datatype.String;
             Data = Encoding.UTF8.GetBytes(message);
-            DataLength = Data.Length;
+            DataLength = Data.Count;
 
             UpdateDisplayAndText();
 
@@ -94,7 +95,7 @@ namespace KLC_Hawk {
 
         public void UpdateDisplayAndText() {
             if (Type == Datatype.Binary) {
-                if (Data.Length == 1)
+                if (Data.Count == 1)
                 {
                     KaseyaMessageTypes kmtype = (KaseyaMessageTypes)Data[0];
                     Display += "Binary " + kmtype.ToString();
@@ -102,14 +103,14 @@ namespace KLC_Hawk {
                 else
                 {
                     Display = "Binary length " + DataLength;
-                    if (Data.Length > 2 && Data[0] == '{' && Data[Data.Length - 1] == '}')
+                    if (Data.Count > 2 && Data[0] == '{' && Data[Data.Count - 1] == '}')
                     {
                         Type = Datatype.JSON;
                         Display = "b! JSON";
                         Text = Encoding.UTF8.GetString(Data);
                     }
 
-                    if (Data.Length > 6 && Data[5] == '{')
+                    if (Data.Count > 6 && Data[5] == '{')
                         Type = Datatype.bJSON;
                 }
             } else if (Type == Datatype.String) {
@@ -129,10 +130,10 @@ namespace KLC_Hawk {
 
                 byte bCode = Data[0];
                 byte[] bLen = new byte[4];
-                Array.Copy(Data, 1, bLen, 0, 4);
+                Data.Slice(1, 4).CopyTo(bLen);
                 Array.Reverse(bLen); //Endianness
                 int jLen = BitConverter.ToInt32(bLen, 0);
-                Text = Encoding.UTF8.GetString(Data, 5, jLen);
+                Text = Encoding.UTF8.GetString(Data.ToArray(), 5, jLen);
             }
 
             //-- Filtering
@@ -195,11 +196,11 @@ namespace KLC_Hawk {
         public byte[] ExportAsBytes() {
             byte[] dtb = BitConverter.GetBytes(Timestamp.ToBinary()); //8
             byte[] modb = Encoding.UTF8.GetBytes(Module);
-            byte[] datalen = BitConverter.GetBytes(Data.Length);
+            byte[] datalen = BitConverter.GetBytes(Data.Count);
             if (dtb.Length != 8 || datalen.Length != 4 || Module.Length > 100)
                 throw new Exception();
 
-            byte[] export = new byte[12 + modb.Length + 1 + datalen.Length + Data.Length];
+            byte[] export = new byte[12 + modb.Length + 1 + datalen.Length + Data.Count];
 
             export[0] = (byte)Side;
             dtb.CopyTo(export, 1); //Length of 8

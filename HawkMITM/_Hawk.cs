@@ -103,7 +103,7 @@ namespace KLC_Hawk {
             return EnableClipboardHostToRemote;
         }
 
-        public void LogOld(Side side, int port, string module, byte[] message) {
+        public void LogOld(Side side, int port, string module, ArraySegment<byte> message) {
             if (windowMain.WindowSharkCapture == null || !windowMain.WindowSharkCapture.IsVisible || !windowMain.WindowSharkCapture.Shark.AllowCapture)
                 return;
 

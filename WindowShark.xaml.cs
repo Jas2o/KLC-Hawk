@@ -97,7 +97,7 @@ namespace KLC_Hawk {
             if (msg == null)
                 return;
 
-            txtHex.Text = BitConverter.ToString(msg.Data).Replace("-", "");
+            txtHex.Text = BitConverter.ToString(msg.Data.ToArray()).Replace("-", "");
             //msHex = new MemoryStream(msg.Data);
             //hexSelected.ByteProvider = new DynamicFileByteProvider(msHex);
 

@@ -65,7 +65,7 @@ namespace KLC_Hawk {
 
         DateTime timeCompareNew = DateTime.MinValue;
 
-        public void AddCapture(Side side, int port, string module, byte[] message) {
+        public void AddCapture(Side side, int port, string module, ArraySegment<byte> message) {
             CaptureMsg msg = new CaptureMsg(0, timeCompareNew, side, port, module, message);
             if (!msg.FilterHideDefault) {
                 window.Dispatcher.Invoke((Action)delegate {

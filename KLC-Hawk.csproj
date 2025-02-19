@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <OutputType>WinExe</OutputType>
     <RootNamespace>KLC_Hawk</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -19,16 +19,14 @@
   <ItemGroup>
     <PackageReference Include="Fleck" Version="1.2.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="nucs.JsonSettings" Version="1.0.7" />
-    <PackageReference Include="RestSharp" Version="106.15.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="nucs.JsonSettings" Version="2.0.2" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
-    <PackageReference Include="WatsonWebsocket" Version="2.3.5" />
+    <PackageReference Include="WatsonWebsocket" Version="4.1.3" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="VP8.NET">
-      <HintPath>..\VP8.NET\bin\Win64\Release\VP8.NET.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\VP8.NET\VP8.NET\VP8.NET.vcxproj" />
   </ItemGroup>
   <Import Project="..\LibKaseya\LibKaseya.projitems" Label="Shared" />
   <Import Project="..\LibKaseyaLiveConnect\LibKaseyaLiveConnect.projitems" Label="Shared" />

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.IO.Pipes;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 
-namespace KLC_Hawk
-{
+namespace KLC_Hawk {
 
     /// <summary>Contains event data for <see cref="NamedPipeMessageReceiveHandler{TMessage}" /> events.</summary>
     /// <typeparam name="TMessage"></typeparam>
@@ -81,7 +79,6 @@ namespace KLC_Hawk
         public event NamedPipeMessageErrorHandler Error;
 
         static readonly String DEFAULT_PIPENAME = typeof(NamedPipeListener).FullName;
-        static readonly BinaryFormatter formatter = new BinaryFormatter();
 
         NamedPipeServerStream pipeServer;
         private bool IsUserUnique;
