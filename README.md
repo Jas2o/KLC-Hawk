@@ -18,6 +18,8 @@ Hawk was also a concept to deal with issues Live Connect had such as before it h
 - You can save the capture and then review it in Hawk later.
   - Some captured messages can be replayed using KLC-Lanner with KLC-Canary.
 
+![Screenshot of KLC-Hawk](/Resources/KLC-Hawk-Capture.png?raw=true)
+
 ## Required other repos to build
 - LibKaseya
 - LibKaseyaLiveConnect
